@@ -4,10 +4,8 @@ import random
 import time
 from datetime import datetime, date
 from flask import Flask, request, jsonify, send_from_directory
-from flask_cors import CORS
 
 app = Flask(__name__, static_folder='static', static_url_path='')
-CORS(app)
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
@@ -25,11 +23,15 @@ LEVELS = [
 
 
 def load_json(filename):
-    with open(os.path.join(DATA_DIR, filename), 'r', encoding='utf-8') as f:
+    filepath = os.path.join(DATA_DIR, filename)
+    if not os.path.exists(filepath):
+        return {'users': {}} if 'users' in filename else {}
+    with open(filepath, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
 def save_json(filename, data):
+    os.makedirs(DATA_DIR, exist_ok=True)
     with open(os.path.join(DATA_DIR, filename), 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 

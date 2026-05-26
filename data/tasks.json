@@ -1,0 +1,129 @@
+{
+  "tasks": [
+    {
+      "id": "checkin",
+      "type": "checkin",
+      "category": "special",
+      "title": "每日签到",
+      "description": "开启新一天的英语学习之旅",
+      "icon": "☀️",
+      "reward_shells": 10,
+      "reward_pearls": 0
+    },
+    {
+      "id": "vocab_review",
+      "type": "vocabulary",
+      "category": "vocabulary",
+      "title": "单词回顾",
+      "description": "复习今天要掌握的5个海洋主题单词",
+      "icon": "📝",
+      "reward_shells": 15,
+      "reward_pearls": 0,
+      "content": {
+        "words": [
+          {"en": "ocean", "zh": "海洋"},
+          {"en": "adventure", "zh": "冒险"},
+          {"en": "treasure", "zh": "宝藏"},
+          {"en": "discover", "zh": "发现"},
+          {"en": "explore", "zh": "探索"}
+        ]
+      }
+    },
+    {
+      "id": "flashcards",
+      "type": "flashcard",
+      "category": "vocabulary",
+      "title": "极速闪卡",
+      "description": "快速匹配英语单词和中文意思",
+      "icon": "⚡",
+      "reward_shells": 15,
+      "reward_pearls": 0,
+      "content": {
+        "pairs": [
+          {"en": "dolphin", "zh": "海豚"},
+          {"en": "coral", "zh": "珊瑚"},
+          {"en": "wave", "zh": "波浪"},
+          {"en": "shell", "zh": "贝壳"},
+          {"en": "pearl", "zh": "珍珠"},
+          {"en": "reef", "zh": "暗礁"}
+        ]
+      }
+    },
+    {
+      "id": "mini_listening",
+      "type": "listening",
+      "category": "listening",
+      "title": "迷你听力",
+      "description": "听英语单词，选择正确的中文意思",
+      "icon": "🎧",
+      "reward_shells": 10,
+      "reward_pearls": 0,
+      "content": {
+        "questions": [
+          {"word": "beautiful", "options": ["美丽的", "丑陋的", "高大的", "渺小的"], "answer": 0},
+          {"word": "rainbow", "options": ["雨水", "彩虹", "风暴", "云朵"], "answer": 1},
+          {"word": "mountain", "options": ["河流", "海洋", "山脉", "沙漠"], "answer": 2}
+        ]
+      }
+    },
+    {
+      "id": "listening_comp",
+      "type": "listening_comp",
+      "category": "listening",
+      "title": "听力理解",
+      "description": "仔细听短文，回答相关问题",
+      "icon": "🔊",
+      "reward_shells": 15,
+      "reward_pearls": 0,
+      "content": {
+        "passage": "The deep ocean is a magical place. Sunlight cannot reach its deepest parts, yet life thrives there. Many creatures create their own light, like tiny stars in the dark water.",
+        "translation": "深海是一个神奇的地方。阳光无法到达它最深的区域，但生命在那里繁荣生长。许多生物能够自己发光，就像黑暗海水中的小星星。",
+        "questions": [
+          {"q": "Why is the deep ocean dark?", "options": ["No water", "Sunlight cannot reach", "Too many fish", "It's cold"], "answer": 1},
+          {"q": "What do deep sea creatures do?", "options": ["Sleep all day", "Create their own light", "Fly in water", "Eat sunlight"], "answer": 1}
+        ]
+      }
+    },
+    {
+      "id": "morning_reading",
+      "type": "reading",
+      "category": "speaking",
+      "title": "朗读练习",
+      "description": "大声朗读以下短文，练习发音和语感",
+      "icon": "📖",
+      "reward_shells": 20,
+      "reward_pearls": 0,
+      "content": {
+        "text": "The sun rises over the ocean. Waves gently touch the shore. A new day begins with endless possibilities. Every morning is a chance to learn something new and become better than yesterday.",
+        "translation": "太阳从海面升起。波浪轻轻拍打着海岸。新的一天充满了无限可能。每个早晨都是学习新东西、变得比昨天更好的机会。"
+      }
+    },
+    {
+      "id": "translation",
+      "type": "translation",
+      "category": "speaking",
+      "title": "翻译练习",
+      "description": "将中文句子翻译成英语，锻炼表达能力",
+      "icon": "✍️",
+      "reward_shells": 20,
+      "reward_pearls": 0,
+      "content": {
+        "sentences": [
+          {"zh": "我想去海边看看美丽的珊瑚礁。", "en": "I want to go to the seaside to see the beautiful coral reefs."},
+          {"zh": "保护海洋环境是我们每个人的责任。", "en": "Protecting the marine environment is everyone's responsibility."},
+          {"zh": "海洋里生活着成千上万种奇妙的生物。", "en": "Thousands of wonderful creatures live in the ocean."}
+        ]
+      }
+    },
+    {
+      "id": "daily_summary",
+      "type": "summary",
+      "category": "special",
+      "title": "今日复盘",
+      "description": "回顾今天的学习成果，记录学习心得",
+      "icon": "📊",
+      "reward_shells": 10,
+      "reward_pearls": 1
+    }
+  ]
+}

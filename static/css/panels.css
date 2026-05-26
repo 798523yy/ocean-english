@@ -1,0 +1,300 @@
+/* === Slide Panel === */
+.slide-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+}
+
+.slide-panel.hidden {
+    display: none;
+}
+
+.panel-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fade-in 0.25s ease;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.panel-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(400px, 90vw);
+    background: rgba(5, 5, 16, 0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    animation: slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -8px 0 48px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes slide-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.panel-close {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: all var(--transition-fast);
+    font-family: var(--font-body);
+}
+
+.panel-close:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--accent);
+}
+
+.panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 56px 18px 28px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.panel-body::-webkit-scrollbar {
+    width: 3px;
+}
+.panel-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+.panel-body::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+/* === Panel Scene Header === */
+.panel-scene-header {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.panel-scene-header h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+    letter-spacing: 0.03em;
+}
+
+.panel-scene-header .scene-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* Category color accents */
+.panel-category.vocabulary .panel-scene-header h2 { color: #FF8C42; }
+.panel-category.vocabulary .panel-scene-header .scene-subtitle { color: #FFAB76; }
+
+.panel-category.listening .panel-scene-header h2 { color: #00B4D8; }
+.panel-category.listening .panel-scene-header .scene-subtitle { color: #48CAE4; }
+
+.panel-category.speaking .panel-scene-header h2 { color: #C77DFF; }
+.panel-category.speaking .panel-scene-header .scene-subtitle { color: #D4A5FF; }
+
+.panel-category.blindbox .panel-scene-header h2 { color: #FFD166; }
+.panel-category.blindbox .panel-scene-header .scene-subtitle { color: #FFE08A; }
+
+/* === Category Tab Navigation === */
+.category-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 0 2px;
+}
+
+.category-tab {
+    flex: 1;
+    padding: 10px 8px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all var(--transition-smooth);
+    text-align: center;
+    letter-spacing: 0.03em;
+}
+
+.category-tab:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+.category-tab.active {
+    color: var(--text-primary);
+    border-color: var(--accent);
+    background: rgba(69, 228, 181, 0.08);
+}
+
+.category-tab[data-cat="vocabulary"].active {
+    border-color: #FF8C42;
+    background: rgba(255, 140, 66, 0.08);
+    color: #FF8C42;
+}
+
+.category-tab[data-cat="listening"].active {
+    border-color: #00B4D8;
+    background: rgba(0, 180, 216, 0.08);
+    color: #00B4D8;
+}
+
+.category-tab[data-cat="speaking"].active {
+    border-color: #C77DFF;
+    background: rgba(199, 125, 255, 0.08);
+    color: #C77DFF;
+}
+
+/* === Panel Task Cards === */
+.panel-body .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.panel-body .task-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.panel-body .task-card.completed {
+    opacity: 0.3;
+    border-color: rgba(72, 187, 120, 0.3);
+}
+
+.panel-body .task-title {
+    color: var(--text-primary);
+}
+
+.panel-body .task-desc {
+    color: var(--text-secondary);
+}
+
+.panel-body .task-reward {
+    background: rgba(255, 140, 66, 0.08);
+    border-color: rgba(255, 140, 66, 0.15);
+    color: #FF8C42;
+}
+
+.panel-body .task-icon {
+    background: var(--surface-raised);
+}
+
+/* === Blindbox Panel === */
+.panel-body .box-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.panel-body .box-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    transition: all var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.panel-body .box-card:hover {
+    border-color: #FFD166;
+    background: rgba(255, 209, 102, 0.06);
+    transform: translateX(-4px);
+    box-shadow: 0 4px 20px rgba(255, 209, 102, 0.12);
+}
+
+.panel-body .box-card:active {
+    transform: scale(0.97);
+}
+
+.panel-body .box-card[data-box="legendary"] {
+    border-color: rgba(255, 209, 102, 0.3);
+}
+
+.panel-body .box-icon {
+    font-size: 32px;
+    width: 44px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.panel-body .box-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.panel-body .box-cost {
+    font-size: 13px;
+    color: #FFD166;
+    font-weight: 600;
+}
+
+.panel-body .box-prob {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* Panel blindbox animation/result */
+.panel-body .box-animation,
+.panel-body .box-result {
+    text-align: center;
+}
+
+/* === Summary modal in panel === */
+.panel-body .summary-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.panel-body .stat-card {
+    text-align: center;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+}

@@ -1,0 +1,325 @@
+/* === Blind Box Page === */
+.scene-blindbox {
+    background: linear-gradient(180deg, #1A1A3E 0%, #2D1B4E 50%, #1A1A3E 100%);
+    min-height: 100%;
+}
+
+.blindbox-container {
+    padding: 16px;
+    text-align: center;
+    padding-bottom: 100px;
+}
+
+.blindbox-container h2 {
+    color: #FFD700;
+    font-size: 24px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 20px rgba(255,215,0,0.4);
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 8px 18px;
+    background: rgba(255,255,255,0.1);
+    color: #E8EAF6;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: var(--font-cartoon);
+    margin-bottom: 8px;
+    transition: all 0.2s;
+}
+
+.back-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Box Options */
+.box-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.box-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.box-card:hover {
+    border-color: #FFD700;
+    background: rgba(255,215,0,0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255,215,0,0.15);
+}
+
+.box-card:active {
+    transform: scale(0.97);
+}
+
+.box-card[data-box="legendary"] {
+    border-color: rgba(255,215,0,0.4);
+    background: rgba(255,215,0,0.05);
+}
+
+.box-icon {
+    font-size: 36px;
+    width: 50px;
+    flex-shrink: 0;
+}
+
+.box-info {
+    text-align: left;
+    flex: 1;
+}
+
+.box-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #E8EAF6;
+    margin-bottom: 4px;
+}
+
+.box-cost {
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFD700;
+}
+
+.box-prob {
+    font-size: 11px;
+    color: #9FA8DA;
+    margin-top: 2px;
+}
+
+/* Open Animation */
+.box-animation {
+    padding: 30px 0;
+}
+
+.chest-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto;
+}
+
+.chest {
+    font-size: 100px;
+    animation: chest-shake 0.6s ease-in-out infinite;
+}
+
+@keyframes chest-shake {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    20% { transform: rotate(-8deg) scale(1.05); }
+    40% { transform: rotate(8deg) scale(1.05); }
+    60% { transform: rotate(-5deg) scale(1.03); }
+    80% { transform: rotate(5deg) scale(1.03); }
+}
+
+.chest.opening {
+    animation: chest-open 0.8s ease-out forwards;
+}
+
+@keyframes chest-open {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+.chest-light {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFD700;
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.chest-light.glow {
+    animation: light-burst 0.6s ease-out forwards;
+}
+
+@keyframes light-burst {
+    0% { width: 20px; height: 20px; opacity: 0; }
+    50% { width: 200px; height: 200px; opacity: 0.8; }
+    100% { width: 300px; height: 300px; opacity: 0; }
+}
+
+.opening-text {
+    color: #FFD700;
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 20px;
+    animation: text-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes text-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* Result */
+.box-result {
+    animation: result-pop 0.5s ease-out;
+}
+
+@keyframes result-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.result-creature-display {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    animation: creature-float 2s ease-in-out infinite;
+}
+
+@keyframes creature-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.rarity-common .result-creature-display {
+    background: radial-gradient(circle, #E8F5E9, #C8E6C9);
+    box-shadow: 0 0 20px rgba(76,175,80,0.3);
+}
+
+.rarity-rare .result-creature-display {
+    background: radial-gradient(circle, #E3F2FD, #BBDEFB);
+    box-shadow: 0 0 25px rgba(33,150,243,0.4);
+}
+
+.rarity-epic .result-creature-display {
+    background: radial-gradient(circle, #F3E5F5, #E1BEE7);
+    box-shadow: 0 0 30px rgba(156,39,176,0.5);
+}
+
+.rarity-legendary .result-creature-display {
+    background: radial-gradient(circle, #FFF8E1, #FFE082);
+    box-shadow: 0 0 40px rgba(255,215,0,0.6);
+    animation: legendary-glow 2s ease-in-out infinite;
+}
+
+@keyframes legendary-glow {
+    0%, 100% { box-shadow: 0 0 30px rgba(255,215,0,0.4); }
+    50% { box-shadow: 0 0 60px rgba(255,215,0,0.8), 0 0 100px rgba(255,152,0,0.4); }
+}
+
+.result-creature-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #E8EAF6;
+    margin-bottom: 4px;
+}
+
+.result-creature-name-en {
+    font-size: 14px;
+    color: #9FA8DA;
+    margin-bottom: 8px;
+}
+
+.result-rarity-tag {
+    display: inline-block;
+    padding: 3px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.rarity-common .result-rarity-tag { background: #C8E6C9; color: #2E7D32; }
+.rarity-rare .result-rarity-tag { background: #BBDEFB; color: #1565C0; }
+.rarity-epic .result-rarity-tag { background: #E1BEE7; color: #7B1FA2; }
+.rarity-legendary .result-rarity-tag { background: #FFE082; color: #E65100; }
+
+.result-desc {
+    font-size: 13px;
+    color: #9FA8DA;
+    margin-bottom: 16px;
+    padding: 0 20px;
+}
+
+.result-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.result-actions button {
+    padding: 10px 22px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--font-cartoon);
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-view-aquarium {
+    background: linear-gradient(135deg, #00BCD4, #2196F3);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,188,212,0.3);
+}
+
+.btn-open-again {
+    background: rgba(255,255,255,0.1);
+    color: #E8EAF6;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+}
+
+.duplicate-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #FFF3CD;
+    color: #856404;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+/* Rarity particles */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 300;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: particle-fall ease-out forwards;
+}
+
+@keyframes particle-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}

@@ -1,0 +1,169 @@
+{
+  "creatures": [
+    {
+      "id": "clownfish",
+      "name": "小丑鱼",
+      "name_en": "Clownfish",
+      "rarity": "common",
+      "description": "住在海葵里的小可爱，橙白相间十分醒目",
+      "size": 40,
+      "color": "#FF6B35",
+      "shape": "fish",
+      "anim_type": "swim_fast"
+    },
+    {
+      "id": "seahorse",
+      "name": "海马",
+      "name_en": "Seahorse",
+      "rarity": "common",
+      "description": "直立游泳的奇特小鱼，爸爸负责生宝宝",
+      "size": 35,
+      "color": "#FFD93D",
+      "shape": "seahorse",
+      "anim_type": "bob"
+    },
+    {
+      "id": "starfish",
+      "name": "海星",
+      "name_en": "Starfish",
+      "rarity": "common",
+      "description": "五角星形状的棘皮动物，断腕还能再生",
+      "size": 45,
+      "color": "#FF8C94",
+      "shape": "star",
+      "anim_type": "crawl"
+    },
+    {
+      "id": "jellyfish",
+      "name": "水母",
+      "name_en": "Jellyfish",
+      "rarity": "common",
+      "description": "透明梦幻的漂浮生物，像海洋里的果冻",
+      "size": 50,
+      "color": "#C9B1FF",
+      "shape": "jellyfish",
+      "anim_type": "float"
+    },
+    {
+      "id": "pufferfish",
+      "name": "河豚",
+      "name_en": "Pufferfish",
+      "rarity": "common",
+      "description": "生气就鼓成球的小刺球，其实很萌",
+      "size": 42,
+      "color": "#7EC8E3",
+      "shape": "puffer",
+      "anim_type": "wobble"
+    },
+    {
+      "id": "turtle",
+      "name": "海龟",
+      "name_en": "Sea Turtle",
+      "rarity": "rare",
+      "description": "优雅的海洋旅行家，能跨越整个大洋",
+      "size": 55,
+      "color": "#5D8A5D",
+      "shape": "turtle",
+      "anim_type": "glide"
+    },
+    {
+      "id": "octopus",
+      "name": "章鱼",
+      "name_en": "Octopus",
+      "rarity": "rare",
+      "description": "八个触手的智慧生物，会变色伪装",
+      "size": 48,
+      "color": "#C44D7A",
+      "shape": "octopus",
+      "anim_type": "crawl"
+    },
+    {
+      "id": "stingray",
+      "name": "鳐鱼",
+      "name_en": "Stingray",
+      "rarity": "rare",
+      "description": "像海底的飞毯一样滑翔，优雅从容",
+      "size": 60,
+      "color": "#8B7355",
+      "shape": "ray",
+      "anim_type": "glide"
+    },
+    {
+      "id": "dolphin",
+      "name": "海豚",
+      "name_en": "Dolphin",
+      "rarity": "rare",
+      "description": "海洋里最聪明的哺乳动物，喜欢跳跃",
+      "size": 65,
+      "color": "#5B9BD5",
+      "shape": "dolphin",
+      "anim_type": "leap"
+    },
+    {
+      "id": "whale",
+      "name": "鲸鱼",
+      "name_en": "Whale",
+      "rarity": "epic",
+      "description": "地球上最大的动物，歌声能传到千里之外",
+      "size": 90,
+      "color": "#3C6E8C",
+      "shape": "whale",
+      "anim_type": "glide"
+    },
+    {
+      "id": "shark",
+      "name": "鲨鱼",
+      "name_en": "Shark",
+      "rarity": "epic",
+      "description": "海洋霸主，但其实对人类的兴趣不如对小鱼",
+      "size": 75,
+      "color": "#6B7B8D",
+      "shape": "shark",
+      "anim_type": "patrol"
+    },
+    {
+      "id": "seadragon",
+      "name": "海龙",
+      "name_en": "Sea Dragon",
+      "rarity": "epic",
+      "description": "叶海龙像飘动的海藻，是大自然的伪装大师",
+      "size": 55,
+      "color": "#4ECDC4",
+      "shape": "seadragon",
+      "anim_type": "float"
+    },
+    {
+      "id": "mermaid",
+      "name": "美人鱼",
+      "name_en": "Mermaid",
+      "rarity": "legendary",
+      "description": "传说中的海洋精灵，歌声能吸引所有海洋生物",
+      "size": 70,
+      "color": "#FF6B9D",
+      "shape": "mermaid",
+      "anim_type": "swim_grace"
+    },
+    {
+      "id": "narwhal",
+      "name": "独角鲸",
+      "name_en": "Narwhal",
+      "rarity": "legendary",
+      "description": "头顶长角的奇幻鲸鱼，被誉为海洋独角兽",
+      "size": 80,
+      "color": "#A8D8EA",
+      "shape": "narwhal",
+      "anim_type": "glide"
+    },
+    {
+      "id": "glow_jellyfish",
+      "name": "发光水母",
+      "name_en": "Glow Jellyfish",
+      "rarity": "legendary",
+      "description": "能在深海中发出迷人荧光的梦幻生物",
+      "size": 55,
+      "color": "#00FFC8",
+      "shape": "jellyfish",
+      "anim_type": "glow_float"
+    }
+  ]
+}

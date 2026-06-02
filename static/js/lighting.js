@@ -72,7 +72,7 @@ const Lighting = {
         return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     },
 
-    lerpColor(a, b, t) {
+    lerpColor(a, colorB, t) {
         const parse = (c) => {
             const match = c.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/);
             if (match) {
@@ -82,7 +82,7 @@ const Lighting = {
             return { r: parseInt(hex.substring(0, 2), 16), g: parseInt(hex.substring(2, 4), 16), b: parseInt(hex.substring(4, 6), 16), a: 1 };
         };
 
-        const ca = parse(a), cb = parse(b);
+        const ca = parse(a), cb = parse(colorB);
         const r = Math.round(ca.r + (cb.r - ca.r) * t);
         const g = Math.round(ca.g + (cb.g - ca.g) * t);
         const b = Math.round(ca.b + (cb.b - ca.b) * t);

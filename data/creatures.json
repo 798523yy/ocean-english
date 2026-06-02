@@ -82,7 +82,7 @@
       "color": "#C44D7A",
       "shape": "octopus",
       "anim_type": "crawl",
-      "sprite_scale": 1.0
+      "sprite_scale": 0.9
     },
     {
       "id": "stingray",
@@ -178,7 +178,7 @@
       "color": "#00FFC8",
       "shape": "jellyfish",
       "anim_type": "glow_float",
-      "sprite_scale": 1.0
+      "sprite_scale": 1.05
     }
   ]
 }

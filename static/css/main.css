@@ -1082,3 +1082,78 @@ body {
     .submenu-item { width: 72px; height: 58px; }
     .greeting-text { font-size: 22px; }
 }
+
+/* 生物信息卡 */
+.creature-info-card {
+    position: fixed;
+    z-index: 1000;
+    width: 220px;
+    background: rgba(10, 26, 46, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.creature-info-card.show {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+}
+
+.cic-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 2px solid;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.cic-emoji {
+    font-size: 36px;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
+}
+
+.cic-names {
+    display: flex;
+    flex-direction: column;
+}
+
+.cic-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.cic-name-en {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+.cic-body {
+    padding: 12px 16px 14px;
+}
+
+.cic-rarity {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.cic-desc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    margin: 0;
+}

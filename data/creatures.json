@@ -9,7 +9,8 @@
       "size": 40,
       "color": "#FF6B35",
       "shape": "fish",
-      "anim_type": "swim_fast"
+      "anim_type": "swim_fast",
+      "sprite_scale": 0.85
     },
     {
       "id": "seahorse",
@@ -20,7 +21,8 @@
       "size": 35,
       "color": "#FFD93D",
       "shape": "seahorse",
-      "anim_type": "bob"
+      "anim_type": "bob",
+      "sprite_scale": 0.8
     },
     {
       "id": "starfish",
@@ -31,7 +33,8 @@
       "size": 45,
       "color": "#FF8C94",
       "shape": "star",
-      "anim_type": "crawl"
+      "anim_type": "crawl",
+      "sprite_scale": 0.9
     },
     {
       "id": "jellyfish",
@@ -42,7 +45,8 @@
       "size": 50,
       "color": "#C9B1FF",
       "shape": "jellyfish",
-      "anim_type": "float"
+      "anim_type": "float",
+      "sprite_scale": 1.0
     },
     {
       "id": "pufferfish",
@@ -53,7 +57,8 @@
       "size": 42,
       "color": "#7EC8E3",
       "shape": "puffer",
-      "anim_type": "wobble"
+      "anim_type": "wobble",
+      "sprite_scale": 0.85
     },
     {
       "id": "turtle",
@@ -64,7 +69,8 @@
       "size": 55,
       "color": "#5D8A5D",
       "shape": "turtle",
-      "anim_type": "glide"
+      "anim_type": "glide",
+      "sprite_scale": 1.1
     },
     {
       "id": "octopus",
@@ -75,7 +81,8 @@
       "size": 48,
       "color": "#C44D7A",
       "shape": "octopus",
-      "anim_type": "crawl"
+      "anim_type": "crawl",
+      "sprite_scale": 1.0
     },
     {
       "id": "stingray",
@@ -86,7 +93,8 @@
       "size": 60,
       "color": "#8B7355",
       "shape": "ray",
-      "anim_type": "glide"
+      "anim_type": "glide",
+      "sprite_scale": 1.15
     },
     {
       "id": "dolphin",
@@ -97,7 +105,8 @@
       "size": 65,
       "color": "#5B9BD5",
       "shape": "dolphin",
-      "anim_type": "leap"
+      "anim_type": "leap",
+      "sprite_scale": 1.2
     },
     {
       "id": "whale",
@@ -108,7 +117,8 @@
       "size": 90,
       "color": "#3C6E8C",
       "shape": "whale",
-      "anim_type": "glide"
+      "anim_type": "glide",
+      "sprite_scale": 1.4
     },
     {
       "id": "shark",
@@ -119,7 +129,8 @@
       "size": 75,
       "color": "#6B7B8D",
       "shape": "shark",
-      "anim_type": "patrol"
+      "anim_type": "patrol",
+      "sprite_scale": 1.3
     },
     {
       "id": "seadragon",
@@ -130,7 +141,8 @@
       "size": 55,
       "color": "#4ECDC4",
       "shape": "seadragon",
-      "anim_type": "float"
+      "anim_type": "float",
+      "sprite_scale": 1.0
     },
     {
       "id": "mermaid",
@@ -141,7 +153,8 @@
       "size": 70,
       "color": "#FF6B9D",
       "shape": "mermaid",
-      "anim_type": "swim_grace"
+      "anim_type": "swim_grace",
+      "sprite_scale": 1.2
     },
     {
       "id": "narwhal",
@@ -152,7 +165,8 @@
       "size": 80,
       "color": "#A8D8EA",
       "shape": "narwhal",
-      "anim_type": "glide"
+      "anim_type": "glide",
+      "sprite_scale": 1.35
     },
     {
       "id": "glow_jellyfish",
@@ -163,7 +177,8 @@
       "size": 55,
       "color": "#00FFC8",
       "shape": "jellyfish",
-      "anim_type": "glow_float"
+      "anim_type": "glow_float",
+      "sprite_scale": 1.0
     }
   ]
 }

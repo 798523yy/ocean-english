@@ -137,20 +137,20 @@ const Tasks = {
 
     showVocabulary(task) {
         const words = task.content.words;
-        let idx = 0;
+        const state = { idx: 0 };
         const render = () => {
-            const w = words[idx];
+            const w = words[state.idx];
             return `
                 <button class="btn-close-modal" onclick="Tasks.closeModal()">✕</button>
                 <h3>${task.icon} ${task.title}</h3>
-                <p class="task-desc-text">${task.description} (${idx + 1}/${words.length})</p>
+                <p class="task-desc-text">${task.description} (${state.idx + 1}/${words.length})</p>
                 <div class="vocab-word">
                     <div class="vocab-en">${w.en}</div>
                     <div class="vocab-zh">${w.zh}</div>
                 </div>
                 <div class="vocab-nav">
-                    ${idx > 0 ? `<button class="btn-secondary" id="vocab-prev">← 上一个</button>` : ''}
-                    ${idx < words.length - 1
+                    ${state.idx > 0 ? `<button class="btn-secondary" id="vocab-prev">← 上一个</button>` : ''}
+                    ${state.idx < words.length - 1
                         ? `<button class="btn-primary" id="vocab-next" style="width:auto;">下一个 →</button>`
                         : `<button class="btn-primary" id="vocab-finish" style="width:auto;">完成复习 \u{1f41a} ${task.reward_shells}</button>`
                     }
@@ -158,14 +158,12 @@ const Tasks = {
             `;
         };
         this.showModal(render());
-        document.getElementById('vocab-prev')?.addEventListener('click', () => { idx--; this.showModal(render()); this._bindVocabNav(task, words, idx, render); });
-        document.getElementById('vocab-next')?.addEventListener('click', () => { idx++; this.showModal(render()); this._bindVocabNav(task, words, idx, render); });
-        document.getElementById('vocab-finish')?.addEventListener('click', () => this.completeTask(task));
+        this._bindVocabNav(task, words, state, render);
     },
 
-    _bindVocabNav(task, words, idx, render) {
-        document.getElementById('vocab-prev')?.addEventListener('click', () => { idx--; this.showModal(render()); this._bindVocabNav(task, words, idx, render); });
-        document.getElementById('vocab-next')?.addEventListener('click', () => { idx++; this.showModal(render()); this._bindVocabNav(task, words, idx, render); });
+    _bindVocabNav(task, words, state, render) {
+        document.getElementById('vocab-prev')?.addEventListener('click', () => { state.idx--; this.showModal(render()); this._bindVocabNav(task, words, state, render); });
+        document.getElementById('vocab-next')?.addEventListener('click', () => { state.idx++; this.showModal(render()); this._bindVocabNav(task, words, state, render); });
         document.getElementById('vocab-finish')?.addEventListener('click', () => this.completeTask(task));
     },
 

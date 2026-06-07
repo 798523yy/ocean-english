@@ -13,6 +13,12 @@ const Aquarium = {
     lastFrameTime: 0,
     spriteAlpha: 0,
 
+    // Weather
+    weather: 'sunny',
+    weatherTimer: 0,
+    weatherDuration: 0,
+    lightningTimer: 0,
+
     // Debug
     debug: false,
     _fpsFrames: 0,
@@ -54,11 +60,23 @@ const Aquarium = {
             ParticleManager.setCapacity(15, 12);
         }
 
+        this.weather = this.randomWeather();
+        this.weatherTimer = 0;
+        this.weatherDuration = 120000 + Math.random() * 180000; // 2-5 min
+
         if (!this.initialized) {
             this.initialized = true;
             this.lastFrameTime = performance.now();
             this.animate();
         }
+    },
+
+    randomWeather() {
+        const r = Math.random();
+        if (r < 0.4) return 'sunny';
+        if (r < 0.65) return 'cloudy';
+        if (r < 0.88) return 'rainy';
+        return 'stormy';
     },
 
     fadeInSprites() {
@@ -141,16 +159,22 @@ const Aquarium = {
         SwimAI.update(dt);
         Interaction.update(dt);
 
-        // 7. 时间段检测
+        // 7. 天气效果
+        this.updateWeather(dt);
+
+        // 8. 时间段检测
         this.updateTimePeriod();
 
-        // 8. 绘制生物（带光晕和深度排序）
+        // 9. 绘制生物（带光晕和深度排序）
         this.drawAllCreatures(ctx);
 
-        // 9. 深度雾
+        // 10. 天气叠加层
+        this.drawWeatherOverlay(ctx);
+
+        // 11. 深度雾
         Lighting.drawDepthFog(ctx, this.width, this.height);
 
-        // 10. Debug FPS
+        // 12. Debug FPS
         if (this.debug) {
             ctx.fillStyle = '#0f0';
             ctx.font = '14px monospace';
@@ -279,5 +303,59 @@ const Aquarium = {
             cancelAnimationFrame(this.animFrame);
             this.animFrame = null;
         }
+    },
+
+    updateWeather(dt) {
+        this.weatherTimer += dt;
+        if (this.weatherTimer > this.weatherDuration) {
+            this.weather = this.randomWeather();
+            this.weatherTimer = 0;
+            this.weatherDuration = 120000 + Math.random() * 180000;
+        }
+
+        // Rain particles
+        if (this.weather === 'rainy') {
+            if (Math.random() < 0.3) {
+                ParticleManager.emit('rain', Math.random() * this.width, -10, {});
+            }
+        } else if (this.weather === 'stormy') {
+            if (Math.random() < 0.7) {
+                ParticleManager.emit('rain', Math.random() * this.width, -10, {});
+            }
+            // Lightning
+            this.lightningTimer -= dt;
+            if (this.lightningTimer <= 0) {
+                ParticleManager.emit('lightning', 100 + Math.random() * (this.width - 200), 0, {});
+                this.lightningTimer = 3000 + Math.random() * 8000;
+            }
+        }
+    },
+
+    drawWeatherOverlay(ctx) {
+        switch (this.weather) {
+            case 'cloudy':
+                ctx.fillStyle = 'rgba(40, 50, 70, 0.08)';
+                ctx.fillRect(0, 0, this.width, this.height);
+                break;
+            case 'rainy':
+                ctx.fillStyle = 'rgba(30, 40, 60, 0.12)';
+                ctx.fillRect(0, 0, this.width, this.height);
+                break;
+            case 'stormy':
+                ctx.fillStyle = 'rgba(20, 25, 40, 0.2)';
+                ctx.fillRect(0, 0, this.width, this.height);
+                // Lightning flash
+                if (this.lightningTimer > -200 && this.lightningTimer < 0) {
+                    ctx.fillStyle = 'rgba(180, 200, 240, 0.06)';
+                    ctx.fillRect(0, 0, this.width, this.height);
+                }
+                break;
+        }
+    },
+
+    // Expose weather for debug/display
+    getWeatherEmoji() {
+        const map = { sunny: '☀️', cloudy: '☁️', rainy: '🌧️', stormy: '⛈️' };
+        return map[this.weather] || '☀️';
     }
 };

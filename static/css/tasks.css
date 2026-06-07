@@ -482,3 +482,52 @@
     color: var(--text-primary);
     border-color: var(--accent);
 }
+
+/* === Spelling === */
+.spelling-word-display {
+    text-align: center;
+    margin: 16px 0;
+}
+.spelling-hint {
+    font-size: 20px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+.spelling-example {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+.spelling-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 18px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text-primary);
+    text-align: center;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.spelling-input:focus {
+    border-color: var(--accent);
+}
+.spelling-feedback {
+    text-align: center;
+    padding: 10px;
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+.spelling-feedback.hidden { display: none; }
+.spelling-feedback.correct {
+    background: rgba(72, 199, 142, 0.15);
+    color: #48C78E;
+}
+.spelling-feedback.wrong {
+    background: rgba(245, 101, 101, 0.15);
+    color: #F56565;
+}

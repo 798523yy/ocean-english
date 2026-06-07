@@ -1,6 +1,26 @@
 const Tasks = {
     allTasks: [],
 
+    getDailyItems(arr, count) {
+        if (!arr || arr.length <= count) return arr.slice();
+        const seed = new Date().toISOString().slice(0, 10);
+        let hash = 0;
+        for (let i = 0; i < seed.length; i++) {
+            hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+            hash |= 0;
+        }
+        const sr = (i) => {
+            let h = ((hash + i * 127) << 5) - (hash + i * 127);
+            return ((h % 2147483647) + 2147483647) % 2147483647 / 2147483647;
+        };
+        const result = [];
+        const pool = arr.slice();
+        for (let i = 0; i < count && pool.length > 0; i++) {
+            result.push(pool.splice(Math.floor(sr(i) * pool.length), 1)[0]);
+        }
+        return result;
+    },
+
     async loadTasksForCategory(category) {
         try {
             const data = await API.getTasks();
@@ -57,6 +77,7 @@ const Tasks = {
             case 'translation': this.showTranslation(task); break;
             case 'listening_comp': this.showListeningComp(task); break;
             case 'summary': this.showSummary(task); break;
+            case 'spelling': this.showSpelling(task); break;
         }
     },
 
@@ -122,7 +143,8 @@ const Tasks = {
     },
 
     showReading(task) {
-        const content = task.content;
+        const texts = task.content.texts || [{text: task.content.text, translation: task.content.translation}];
+        const content = this.getDailyItems(texts, 1)[0];
         this.showModal(`
             <button class="btn-close-modal" onclick="Tasks.closeModal()">✕</button>
             <h3>${task.icon} ${task.title}</h3>
@@ -136,7 +158,7 @@ const Tasks = {
     },
 
     showVocabulary(task) {
-        const words = task.content.words;
+        const words = this.getDailyItems(task.content.words, task.content.words_per_day || 5);
         const state = { idx: 0 };
         const render = () => {
             const w = words[state.idx];
@@ -168,7 +190,7 @@ const Tasks = {
     },
 
     showFlashcard(task) {
-        const pairs = task.content.pairs;
+        const pairs = this.getDailyItems(task.content.pairs, task.content.pairs_per_day || 6);
         let currentIdx = 0;
         let correctCount = 0;
         let wrongAttempts = 0;
@@ -233,7 +255,7 @@ const Tasks = {
     },
 
     showMiniListening(task) {
-        const questions = task.content.questions;
+        const questions = this.getDailyItems(task.content.questions, task.content.questions_per_day || 4);
         let qIdx = 0;
         let score = 0;
         const passScore = 2;
@@ -297,7 +319,7 @@ const Tasks = {
     },
 
     showTranslation(task) {
-        const sentences = task.content.sentences;
+        const sentences = this.getDailyItems(task.content.sentences, task.content.sentences_per_day || 3);
         let sIdx = 0;
         let completed = 0;
 
@@ -341,7 +363,8 @@ const Tasks = {
     },
 
     showListeningComp(task) {
-        const content = task.content;
+        const passages = task.content.passages || [{passage: task.content.passage, translation: task.content.translation, questions: task.content.questions}];
+        const content = this.getDailyItems(passages, 1)[0];
         let qIdx = 0;
         let score = 0;
 
@@ -430,5 +453,71 @@ const Tasks = {
                 记录复盘 \u{1f41a} ${task.reward_shells} ${task.reward_pearls ? '+ \u{1f4ce}1' : ''}
             </button>
         `);
+    },
+
+    showSpelling(task) {
+        const words = this.getDailyItems(task.content.words, task.content.words_per_day || 5);
+        const state = { idx: 0, score: 0 };
+
+        const render = () => {
+            if (state.idx >= words.length) {
+                this.showModal(`
+                    <h3>🔤 拼写完成！</h3>
+                    <p style="text-align:center;margin:16px 0;">得分: ${state.score}/${words.length}</p>
+                    <button class="btn-primary" onclick="Tasks.completeTask(Tasks.allTasks.find(t=>t.id==='spelling_bee'))">
+                        领取奖励 \u{1f41a} ${task.reward_shells}
+                    </button>
+                `);
+                return;
+            }
+            const w = words[state.idx];
+            this.showModal(`
+                <button class="btn-close-modal" onclick="Tasks.closeModal()">✕</button>
+                <h3>${task.icon} ${task.title}</h3>
+                <p class="task-desc-text">听发音，拼写单词 (${state.idx + 1}/${words.length})</p>
+                <div class="spelling-word-display">
+                    <div class="spelling-hint">💡 ${w.hint}</div>
+                    <div class="spelling-example">"${w.example}"</div>
+                </div>
+                <input type="text" class="spelling-input" id="spelling-input" placeholder="输入英文单词..." autocomplete="off" autocapitalize="off">
+                <div id="spelling-feedback" class="spelling-feedback hidden"></div>
+                <div style="display:flex;gap:10px;">
+                    <button class="btn-secondary" id="spelling-speak" style="flex:1;">🔊 听发音</button>
+                    <button class="btn-primary" id="spelling-check" style="flex:1;">检查 →</button>
+                </div>
+            `);
+
+            const speak = () => {
+                if ('speechSynthesis' in window) {
+                    speechSynthesis.cancel();
+                    const u = new SpeechSynthesisUtterance(w.word);
+                    u.lang = 'en-US';
+                    u.rate = 0.7;
+                    speechSynthesis.speak(u);
+                }
+            };
+            speak();
+
+            document.getElementById('spelling-speak').addEventListener('click', speak);
+            document.getElementById('spelling-check').addEventListener('click', () => {
+                const input = document.getElementById('spelling-input').value.trim().toLowerCase();
+                const fb = document.getElementById('spelling-feedback');
+                fb.classList.remove('hidden');
+                if (input === w.word.toLowerCase()) {
+                    fb.innerHTML = '✅ 正确！';
+                    fb.className = 'spelling-feedback correct';
+                    state.score++;
+                } else {
+                    fb.innerHTML = `❌ 正确答案: <b>${w.word}</b>`;
+                    fb.className = 'spelling-feedback wrong';
+                }
+                document.getElementById('spelling-check').textContent = state.idx >= words.length - 1 ? '完成 →' : '下一题 →';
+                document.getElementById('spelling-check').onclick = () => {
+                    state.idx++;
+                    render();
+                };
+            });
+        };
+        render();
     }
 };

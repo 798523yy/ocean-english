@@ -123,6 +123,13 @@ const Interaction = {
         if (my < rect.height * 0.2 && window.SwimAI) {
             SwimAI.feed(mx, my);
             ParticleManager.emit('surface_ripple', mx, my, {});
+            ParticleManager.emit('food', mx, my + 15, { count: 20 });
+            // 延迟第二批食物，模拟持续撒落
+            setTimeout(() => {
+                if (window.ParticleManager) {
+                    ParticleManager.emit('food', mx + (Math.random()-0.5)*50, my + 20, { count: 10 });
+                }
+            }, 400);
         }
     },
 

@@ -20,12 +20,38 @@
       "reward_shells": 15,
       "reward_pearls": 0,
       "content": {
+        "words_per_day": 5,
         "words": [
           {"en": "ocean", "zh": "海洋"},
           {"en": "adventure", "zh": "冒险"},
           {"en": "treasure", "zh": "宝藏"},
           {"en": "discover", "zh": "发现"},
-          {"en": "explore", "zh": "探索"}
+          {"en": "explore", "zh": "探索"},
+          {"en": "coral", "zh": "珊瑚"},
+          {"en": "wave", "zh": "波浪"},
+          {"en": "reef", "zh": "暗礁"},
+          {"en": "shell", "zh": "贝壳"},
+          {"en": "pearl", "zh": "珍珠"},
+          {"en": "current", "zh": "洋流"},
+          {"en": "horizon", "zh": "地平线"},
+          {"en": "voyage", "zh": "航行"},
+          {"en": "anchor", "zh": "船锚"},
+          {"en": "harbor", "zh": "港口"},
+          {"en": "sailor", "zh": "水手"},
+          {"en": "compass", "zh": "指南针"},
+          {"en": "lighthouse", "zh": "灯塔"},
+          {"en": "seagull", "zh": "海鸥"},
+          {"en": "tide", "zh": "潮汐"},
+          {"en": "coast", "zh": "海岸"},
+          {"en": "island", "zh": "岛屿"},
+          {"en": "submarine", "zh": "潜水艇"},
+          {"en": "plankton", "zh": "浮游生物"},
+          {"en": "kelp", "zh": "海带"},
+          {"en": "fossil", "zh": "化石"},
+          {"en": "lagoon", "zh": "潟湖"},
+          {"en": "whirlpool", "zh": "漩涡"},
+          {"en": "breeze", "zh": "微风"},
+          {"en": "glacier", "zh": "冰川"}
         ]
       }
     },
@@ -39,13 +65,28 @@
       "reward_shells": 15,
       "reward_pearls": 0,
       "content": {
+        "pairs_per_day": 6,
         "pairs": [
           {"en": "dolphin", "zh": "海豚"},
           {"en": "coral", "zh": "珊瑚"},
           {"en": "wave", "zh": "波浪"},
           {"en": "shell", "zh": "贝壳"},
           {"en": "pearl", "zh": "珍珠"},
-          {"en": "reef", "zh": "暗礁"}
+          {"en": "reef", "zh": "暗礁"},
+          {"en": "whale", "zh": "鲸鱼"},
+          {"en": "shark", "zh": "鲨鱼"},
+          {"en": "turtle", "zh": "海龟"},
+          {"en": "jellyfish", "zh": "水母"},
+          {"en": "starfish", "zh": "海星"},
+          {"en": "octopus", "zh": "章鱼"},
+          {"en": "seahorse", "zh": "海马"},
+          {"en": "stingray", "zh": "鳐鱼"},
+          {"en": "penguin", "zh": "企鹅"},
+          {"en": "seal", "zh": "海豹"},
+          {"en": "crab", "zh": "螃蟹"},
+          {"en": "lobster", "zh": "龙虾"},
+          {"en": "squid", "zh": "鱿鱼"},
+          {"en": "clam", "zh": "蛤蜊"}
         ]
       }
     },
@@ -59,10 +100,20 @@
       "reward_shells": 10,
       "reward_pearls": 0,
       "content": {
+        "questions_per_day": 4,
         "questions": [
           {"word": "beautiful", "options": ["美丽的", "丑陋的", "高大的", "渺小的"], "answer": 0},
           {"word": "rainbow", "options": ["雨水", "彩虹", "风暴", "云朵"], "answer": 1},
-          {"word": "mountain", "options": ["河流", "海洋", "山脉", "沙漠"], "answer": 2}
+          {"word": "mountain", "options": ["河流", "海洋", "山脉", "沙漠"], "answer": 2},
+          {"word": "whisper", "options": ["大喊", "低语", "歌唱", "哭泣"], "answer": 1},
+          {"word": "brave", "options": ["胆小的", "勇敢的", "懒惰的", "疲惫的"], "answer": 1},
+          {"word": "ancient", "options": ["现代的", "年轻的", "古老的", "未来的"], "answer": 2},
+          {"word": "journey", "options": ["终点", "休息", "旅行", "建筑"], "answer": 2},
+          {"word": "gentle", "options": ["粗暴的", "温柔的", "快速的", "沉重的"], "answer": 1},
+          {"word": "mystery", "options": ["谜团", "答案", "问题", "常识"], "answer": 0},
+          {"word": "brilliant", "options": ["黑暗的", "愚蠢的", "杰出的", "普通的"], "answer": 2},
+          {"word": "fragile", "options": ["坚固的", "易碎的", "巨大的", "沉重的"], "answer": 1},
+          {"word": "serene", "options": ["喧闹的", "愤怒的", "宁静的", "焦虑的"], "answer": 2}
         ]
       }
     },
@@ -76,11 +127,31 @@
       "reward_shells": 15,
       "reward_pearls": 0,
       "content": {
-        "passage": "The deep ocean is a magical place. Sunlight cannot reach its deepest parts, yet life thrives there. Many creatures create their own light, like tiny stars in the dark water.",
-        "translation": "深海是一个神奇的地方。阳光无法到达它最深的区域，但生命在那里繁荣生长。许多生物能够自己发光，就像黑暗海水中的小星星。",
-        "questions": [
-          {"q": "Why is the deep ocean dark?", "options": ["No water", "Sunlight cannot reach", "Too many fish", "It's cold"], "answer": 1},
-          {"q": "What do deep sea creatures do?", "options": ["Sleep all day", "Create their own light", "Fly in water", "Eat sunlight"], "answer": 1}
+        "passages": [
+          {
+            "passage": "The deep ocean is a magical place. Sunlight cannot reach its deepest parts, yet life thrives there. Many creatures create their own light, like tiny stars in the dark water.",
+            "translation": "深海是一个神奇的地方。阳光无法到达它最深的区域，但生命在那里繁荣生长。许多生物能够自己发光，就像黑暗海水中的小星星。",
+            "questions": [
+              {"q": "Why is the deep ocean dark?", "options": ["No water", "Sunlight cannot reach", "Too many fish", "It's cold"], "answer": 1},
+              {"q": "What do deep sea creatures do?", "options": ["Sleep all day", "Create their own light", "Fly in water", "Eat sunlight"], "answer": 1}
+            ]
+          },
+          {
+            "passage": "Coral reefs are often called the rainforests of the sea. They cover less than one percent of the ocean floor, but they are home to nearly a quarter of all marine species.",
+            "translation": "珊瑚礁常被称为海洋中的热带雨林。它们只覆盖了不到百分之一的海底，但却是近四分之一海洋物种的家园。",
+            "questions": [
+              {"q": "What are coral reefs compared to?", "options": ["Deserts", "Rainforests", "Mountains", "Cities"], "answer": 1},
+              {"q": "How much ocean floor do reefs cover?", "options": ["Over 50%", "About 25%", "Less than 1%", "Exactly 10%"], "answer": 2}
+            ]
+          },
+          {
+            "passage": "Whales are the largest animals on Earth. The blue whale can grow up to thirty meters long and weigh as much as two hundred tons. Despite their size, they feed mainly on tiny krill.",
+            "translation": "鲸鱼是地球上最大的动物。蓝鲸可以长到三十米长，重达两百吨。尽管体型庞大，它们主要以微小的磷虾为食。",
+            "questions": [
+              {"q": "How long can a blue whale grow?", "options": ["10 meters", "20 meters", "30 meters", "50 meters"], "answer": 2},
+              {"q": "What do blue whales mainly eat?", "options": ["Big fish", "Krill", "Seaweed", "Sharks"], "answer": 1}
+            ]
+          }
         ]
       }
     },
@@ -94,8 +165,20 @@
       "reward_shells": 20,
       "reward_pearls": 0,
       "content": {
-        "text": "The sun rises over the ocean. Waves gently touch the shore. A new day begins with endless possibilities. Every morning is a chance to learn something new and become better than yesterday.",
-        "translation": "太阳从海面升起。波浪轻轻拍打着海岸。新的一天充满了无限可能。每个早晨都是学习新东西、变得比昨天更好的机会。"
+        "texts": [
+          {
+            "text": "The sun rises over the ocean. Waves gently touch the shore. A new day begins with endless possibilities. Every morning is a chance to learn something new and become better than yesterday.",
+            "translation": "太阳从海面升起。波浪轻轻拍打着海岸。新的一天充满了无限可能。每个早晨都是学习新东西、变得比昨天更好的机会。"
+          },
+          {
+            "text": "A ship sails across the endless blue water. Seagulls follow behind, calling to each other. The captain steers toward the horizon, where the sky meets the sea. Adventure awaits beyond every wave.",
+            "translation": "一艘船在无尽的蓝色水面上航行。海鸥跟在后面，互相呼唤。船长朝着地平线驶去，那里天空与大海相接。冒险在每一道波浪之后等待着。"
+          },
+          {
+            "text": "Dive beneath the surface and you will find a world of wonder. Colorful fish dart between coral gardens. Sea turtles glide gracefully through crystal waters. The ocean holds secrets older than time itself.",
+            "translation": "潜入水面之下，你会发现一个奇妙的世界。五颜六色的鱼在珊瑚花园中穿梭。海龟在水晶般清澈的水中优雅滑行。海洋蕴藏着比时间本身更古老的秘密。"
+          }
+        ]
       }
     },
     {
@@ -108,10 +191,50 @@
       "reward_shells": 20,
       "reward_pearls": 0,
       "content": {
+        "sentences_per_day": 3,
         "sentences": [
           {"zh": "我想去海边看看美丽的珊瑚礁。", "en": "I want to go to the seaside to see the beautiful coral reefs."},
           {"zh": "保护海洋环境是我们每个人的责任。", "en": "Protecting the marine environment is everyone's responsibility."},
-          {"zh": "海洋里生活着成千上万种奇妙的生物。", "en": "Thousands of wonderful creatures live in the ocean."}
+          {"zh": "海洋里生活着成千上万种奇妙的生物。", "en": "Thousands of wonderful creatures live in the ocean."},
+          {"zh": "海豚是海洋中最聪明的动物之一。", "en": "Dolphins are one of the smartest animals in the ocean."},
+          {"zh": "那天我们在沙滩上捡到了很多漂亮的贝壳。", "en": "We picked up many beautiful shells on the beach that day."},
+          {"zh": "灯塔在暴风雨中为船只指引方向。", "en": "The lighthouse guides ships during the storm."},
+          {"zh": "鲸鱼的歌声可以在海洋中传播数百公里。", "en": "A whale's song can travel hundreds of kilometers through the ocean."},
+          {"zh": "深海里的生物进化出了发光的本领。", "en": "Deep sea creatures have evolved the ability to produce light."},
+          {"zh": "潮汐是由月球和太阳的引力引起的。", "en": "Tides are caused by the gravitational pull of the moon and the sun."},
+          {"zh": "这座小岛周围环绕着清澈碧蓝的海水。", "en": "The island is surrounded by clear blue water."},
+          {"zh": "水手们用星星和指南针在海上导航。", "en": "Sailors used stars and compasses to navigate at sea."},
+          {"zh": "珊瑚礁为无数海洋生物提供了栖息地。", "en": "Coral reefs provide habitats for countless marine creatures."}
+        ]
+      }
+    },
+    {
+      "id": "spelling_bee",
+      "type": "spelling",
+      "category": "vocabulary",
+      "title": "拼写挑战",
+      "description": "听单词发音，拼写出正确的英文单词",
+      "icon": "🔤",
+      "reward_shells": 20,
+      "reward_pearls": 0,
+      "content": {
+        "words_per_day": 5,
+        "words": [
+          {"word": "ocean", "hint": "海洋", "example": "The ___ is vast and deep."},
+          {"word": "wave", "hint": "波浪", "example": "Surfers love to ride the ___."},
+          {"word": "beach", "hint": "沙滩", "example": "Let's go to the ___ this weekend."},
+          {"word": "storm", "hint": "暴风雨", "example": "The ___ caused huge waves."},
+          {"word": "pearl", "hint": "珍珠", "example": "She wore a necklace of ___."},
+          {"word": "dolphin", "hint": "海豚", "example": "A ___ jumped out of the water."},
+          {"word": "whale", "hint": "鲸鱼", "example": "The blue ___ is the largest animal."},
+          {"word": "coral", "hint": "珊瑚", "example": "The ___ reef is full of life."},
+          {"word": "shell", "hint": "贝壳", "example": "I found a pretty ___ on the sand."},
+          {"word": "island", "hint": "岛屿", "example": "They sailed to a remote ___."},
+          {"word": "sailor", "hint": "水手", "example": "The old ___ told amazing stories."},
+          {"word": "anchor", "hint": "船锚", "example": "The ship dropped its ___ in the bay."},
+          {"word": "treasure", "hint": "宝藏", "example": "Pirates buried their ___ on the island."},
+          {"word": "bridge", "hint": "桥梁", "example": "The ___ connects the two islands."},
+          {"word": "glacier", "hint": "冰川", "example": "The ___ slowly moves toward the sea."}
         ]
       }
     },

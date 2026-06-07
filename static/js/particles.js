@@ -104,11 +104,57 @@ const ParticleManager = {
                     age: 0,
                 });
                 break;
+
+            case 'food':
+                const count = options.count || 12;
+                for (let i = 0; i < count; i++) {
+                    this.particles.push({
+                        type: 'food',
+                        x: x + (Math.random() - 0.5) * 40,
+                        y: y + (Math.random() - 0.5) * 10,
+                        size: 1.5 + Math.random() * 3,
+                        alpha: 0.9,
+                        speedX: (Math.random() - 0.5) * 0.4,
+                        speedY: 0.3 + Math.random() * 0.8,
+                        color: ['#F0C060', '#E8A840', '#D09030', '#FFD700'][Math.floor(Math.random() * 4)],
+                        life: 2000 + Math.random() * 2000,
+                        age: 0,
+                        wobble: Math.random() * Math.PI * 2,
+                    });
+                }
+                break;
+
+            case 'rain':
+                this.particles.push({
+                    type: 'rain',
+                    x: x || Math.random() * 2000,
+                    y: y || -10 - Math.random() * 200,
+                    length: 8 + Math.random() * 14,
+                    alpha: 0.15 + Math.random() * 0.25,
+                    speedY: 6 + Math.random() * 8,
+                    speedX: -0.5 - Math.random() * 1.5,
+                    life: Infinity,
+                });
+                break;
+
+            case 'lightning':
+                this.particles.push({
+                    type: 'lightning',
+                    x: x || Math.random() * 2000,
+                    y: 0,
+                    alpha: 1.0,
+                    life: 150,
+                    age: 0,
+                    branches: 2 + Math.floor(Math.random() * 3),
+                });
+                break;
         }
     },
 
     update(dt, width, height) {
         if (!dt || dt > 100) dt = 16;
+        this._refHeight = height;
+        this._refWidth = width;
 
         for (let i = this.particles.length - 1; i >= 0; i--) {
             const p = this.particles[i];
@@ -143,6 +189,36 @@ const ParticleManager = {
                     p.x += p.speedX * (dt / 16);
                     p.y += p.speedY * (dt / 16);
                     if (p.type === 'firework') p.speedY += 0.02 * (dt / 16);
+                    if (p.age > p.life) this.particles.splice(i, 1);
+                    break;
+
+                case 'food':
+                    p.age += dt;
+                    p.y += p.speedY * (dt / 16);
+                    p.wobble += 0.03 * (dt / 16);
+                    p.x += p.speedX * (dt / 16) + Math.sin(p.wobble) * 0.5 * (dt / 16);
+                    p.speedY += 0.01 * (dt / 16); // gravity
+                    if (p.y > 0.85 * this._refHeight || p.age > p.life) {
+                        if (p.y > 0.85 * this._refHeight && p.age < p.life * 0.5) {
+                            // Food hit sand - tiny ripple
+                            this.emit('ripple', p.x, p.y, {});
+                        }
+                        this.particles.splice(i, 1);
+                    }
+                    break;
+
+                case 'rain':
+                    p.y += p.speedY * (dt / 16);
+                    p.x += p.speedX * (dt / 16);
+                    if (p.y > this._refHeight) {
+                        this.emit('surface_ripple', p.x, 30, {});
+                        p.y = -10 - Math.random() * 100;
+                        p.x = Math.random() * (this._refWidth || 2000);
+                    }
+                    break;
+
+                case 'lightning':
+                    p.age += dt;
                     if (p.age > p.life) this.particles.splice(i, 1);
                     break;
 
@@ -218,6 +294,44 @@ const ParticleManager = {
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.size * lifeRatio, 0, Math.PI * 2);
                     ctx.fill();
+                    break;
+
+                case 'food':
+                    const foodRatio = 1 - Math.max(0, (p.age / p.life));
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = foodRatio * p.alpha;
+                    ctx.shadowColor = p.color;
+                    ctx.shadowBlur = p.size;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * (0.6 + 0.4 * foodRatio), 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+
+                case 'rain':
+                    ctx.strokeStyle = `rgba(180, 210, 240, ${p.alpha})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x + p.speedX * 2, p.y - p.length);
+                    ctx.stroke();
+                    break;
+
+                case 'lightning':
+                    const lRatio = 1 - Math.abs(p.age / p.life - 0.5) * 2;
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${lRatio})`;
+                    ctx.lineWidth = 2;
+                    ctx.shadowColor = `rgba(200, 220, 255, ${lRatio})`;
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, 0);
+                    let lx = p.x, ly = 0;
+                    for (let b = 0; b < p.branches; b++) {
+                        lx += (Math.random() - 0.5) * 60;
+                        ly += 40 + Math.random() * 60;
+                        ctx.lineTo(lx, ly);
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
                     break;
             }
 

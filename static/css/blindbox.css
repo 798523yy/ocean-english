@@ -323,3 +323,62 @@
     0% { transform: translateY(0) rotate(0deg); opacity: 1; }
     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
+
+/* === Festival Banner === */
+.festival-banner {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 152, 0, 0.1));
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    text-align: center;
+    font-size: 13px;
+    color: #FFD700;
+    margin-bottom: 14px;
+    animation: banner-glow 2s ease-in-out infinite;
+}
+
+.festival-banner b {
+    color: #FFA000;
+}
+
+@keyframes banner-glow {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 215, 0, 0.1); }
+    50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.25); }
+}
+
+/* === Wheel === */
+.wheel-container {
+    text-align: center;
+    padding: 10px 0;
+    animation: fade-in 0.3s ease;
+}
+
+.wheel-container canvas {
+    display: block;
+    margin: 0 auto;
+    border-radius: 50%;
+}
+
+.wheel-spin-btn {
+    display: block;
+    margin: 18px auto 0;
+    width: 80%;
+    max-width: 260px;
+    font-size: 16px;
+    padding: 14px;
+    transition: all var(--transition-smooth);
+}
+
+.wheel-spin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.wheel-result-tag {
+    color: #FFD700;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}

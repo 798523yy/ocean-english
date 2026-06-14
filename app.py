@@ -52,6 +52,7 @@ def create_new_user(uid, name):
         'id': uid,
         'phone': uid if uid != 'default' else '',
         'name': name,
+        'avatar': '🐠',
         'shells': 100,
         'pearls': 3,
         'creatures': [],
@@ -60,7 +61,10 @@ def create_new_user(uid, name):
         'last_checkin': None,
         'today_tasks': {},
         'total_tasks_completed': 0,
-        'created_at': datetime.now().isoformat()
+        'created_at': datetime.now().isoformat(),
+        'friends': [],
+        'incoming_requests': [],
+        'outgoing_requests': []
     }
 
 
@@ -151,8 +155,43 @@ def api_update_user():
         return jsonify({'error': 'User not found'}), 404
     if 'name' in data:
         user['name'] = data['name']
+    if 'avatar' in data:
+        user['avatar'] = data['avatar']
     save_user(uid, user)
     return jsonify(user)
+
+
+@app.route('/api/user/profile', methods=['POST'])
+def api_update_profile():
+    """Update user profile: name and/or avatar"""
+    data = request.json
+    uid = data.get('uid', 'default')
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    changed = False
+    new_name = data.get('name', '').strip()
+    new_avatar = data.get('avatar', '').strip()
+
+    if new_name and len(new_name) > 0 and len(new_name) <= 20:
+        user['name'] = new_name
+        changed = True
+    elif new_name and len(new_name) > 20:
+        return jsonify({'error': '名字不能超过20个字符'}), 400
+
+    if new_avatar and len(new_avatar) > 0 and len(new_avatar) <= 4:
+        user['avatar'] = new_avatar
+        changed = True
+    elif new_avatar and len(new_avatar) > 4:
+        return jsonify({'error': '头像格式不正确'}), 400
+
+    if not changed:
+        return jsonify({'error': '没有要更新的内容'}), 400
+
+    save_user(uid, user)
+    level = get_level_info(user.get('total_tasks_completed', 0))
+    return jsonify({'user': user, 'level': level})
 
 
 # === Tasks ===
@@ -262,6 +301,41 @@ def api_checkin():
     })
 
 
+# === Events ===
+
+def get_active_event():
+    """检测当前是否有节日活动"""
+    today = date.today()
+    events = [
+        # (start_month, start_day, end_month, end_day, name, emoji, legend_bonus)
+        (1, 1, 1, 3, '元旦', '🎉', True),       # New Year
+        (2, 10, 2, 15, '春节', '🧧', True),      # Chinese New Year (approx)
+        (5, 31, 6, 2, '儿童节', '🎈', False),     # Children's Day
+        (6, 7, 6, 9, '世界海洋日', '🌊', True),   # World Ocean Day
+        (9, 10, 9, 12, '中秋节', '🥮', True),     # Mid-Autumn (approx)
+        (10, 1, 10, 7, '国庆节', '🇨🇳', True),    # National Day
+        (10, 28, 11, 1, '万圣节', '🎃', False),   # Halloween
+        (12, 24, 12, 26, '圣诞节', '🎄', True),    # Christmas
+    ]
+    for sm, sd, em, ed, name, emoji, legend_bonus in events:
+        start = date(today.year, sm, sd)
+        end = date(today.year, em, ed)
+        if start <= today <= end:
+            return {
+                'active': True,
+                'name': name,
+                'emoji': emoji,
+                'legendary_bonus': legend_bonus,
+                'end_date': end.isoformat()
+            }
+    return {'active': False}
+
+
+@app.route('/api/event', methods=['GET'])
+def api_get_event():
+    return jsonify(get_active_event())
+
+
 # === Blindbox ===
 
 @app.route('/api/blindbox/open', methods=['POST'])
@@ -269,14 +343,21 @@ def api_open_blindbox():
     data = request.json
     uid = data.get('uid', 'default')
     box_type = data.get('box_type', 'normal')
+    force_creature_id = data.get('force_creature_id')  # 大转盘指定的具体生物
     user = get_user(uid)
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
+    event = get_active_event()
+    legend_boost = event['active'] and event.get('legendary_bonus')
+
     box_config = {
         'normal': {'cost_shells': 50, 'cost_pearls': 0, 'weights': [60, 25, 10, 5]},
         'rare': {'cost_shells': 200, 'cost_pearls': 0, 'weights': [10, 50, 30, 10]},
-        'legendary': {'cost_shells': 0, 'cost_pearls': 5, 'weights': [0, 0, 60, 40]}
+        'legendary': {
+            'cost_shells': 0, 'cost_pearls': 5,
+            'weights': [0, 0, 40, 60] if legend_boost else [0, 0, 60, 40]
+        }
     }
     config = box_config.get(box_type)
     if not config:
@@ -292,9 +373,16 @@ def api_open_blindbox():
 
     creatures_data = load_json('creatures.json')
     rarities = ['common', 'rare', 'epic', 'legendary']
-    rarity = random.choices(rarities, weights=config['weights'], k=1)[0]
-    pool = [c for c in creatures_data['creatures'] if c['rarity'] == rarity]
-    creature = random.choice(pool)
+
+    # 大转盘指定具体生物（抽中什么得什么）
+    if force_creature_id:
+        creature = next((c for c in creatures_data['creatures'] if c['id'] == force_creature_id), None)
+        if not creature:
+            return jsonify({'error': 'Creature not found'}), 404
+    else:
+        rarity = random.choices(rarities, weights=config['weights'], k=1)[0]
+        pool = [c for c in creatures_data['creatures'] if c['rarity'] == rarity]
+        creature = random.choice(pool)
 
     is_duplicate = creature['id'] in user.get('creatures', [])
     if not is_duplicate:
@@ -307,7 +395,7 @@ def api_open_blindbox():
             'y': random.randint(10, 70)
         })
     else:
-        dup_shells = {'common': 15, 'rare': 40, 'epic': 80, 'legendary': 150}.get(rarity, 10)
+        dup_shells = 50  # 已有生物统一补偿50贝壳
         user['shells'] += dup_shells
 
     save_user(uid, user)
@@ -316,6 +404,102 @@ def api_open_blindbox():
         'creature': creature,
         'is_duplicate': is_duplicate,
         'duplicate_reward': dup_shells if is_duplicate else 0,
+        'user': user
+    })
+
+
+# === Spin Reward (大转盘贝壳/珍珠奖励) ===
+
+@app.route('/api/blindbox/spin-reward', methods=['POST'])
+def api_spin_reward():
+    data = request.json
+    uid = data.get('uid', 'default')
+    box_type = data.get('box_type', 'normal')
+    reward_type = data.get('reward_type', 'shells')  # 'shells' or 'pearls'
+    amount = data.get('amount', 0)
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    box_config = {
+        'normal': {'cost_shells': 50, 'cost_pearls': 0},
+        'rare': {'cost_shells': 200, 'cost_pearls': 0},
+        'legendary': {'cost_shells': 0, 'cost_pearls': 5}
+    }
+    config = box_config.get(box_type)
+    if not config:
+        return jsonify({'error': 'Invalid box type'}), 400
+
+    if config['cost_shells'] > user.get('shells', 0):
+        return jsonify({'error': '贝壳不足'}), 400
+    if config['cost_pearls'] > user.get('pearls', 0):
+        return jsonify({'error': '珍珠不足'}), 400
+
+    user['shells'] -= config['cost_shells']
+    user['pearls'] -= config['cost_pearls']
+
+    if reward_type == 'shells':
+        user['shells'] = user.get('shells', 0) + amount
+    elif reward_type == 'pearls':
+        user['pearls'] = user.get('pearls', 0) + amount
+
+    save_user(uid, user)
+    return jsonify({
+        'success': True,
+        'reward_type': reward_type,
+        'amount': amount,
+        'user': user
+    })
+
+
+# === Redeem Code ===
+
+REDEEM_CODES = {
+    '0923': {
+        'type': 'cheat',
+        'shells': 999999,
+        'pearls': 9999,
+        'description': '🎮 作弊码：无限资源',
+        'used': set()  # 已使用的uid集合（作弊码可无限次使用）
+    }
+}
+
+
+@app.route('/api/redeem', methods=['POST'])
+def api_redeem():
+    data = request.json
+    uid = data.get('uid', 'default')
+    code = data.get('code', '').strip()
+    user = get_user(uid)
+    if not user:
+        user = create_new_user(uid, '探险家')
+        save_user(uid, user)
+
+    if not code:
+        return jsonify({'error': '请输入兑换码'}), 400
+
+    code_info = REDEEM_CODES.get(code)
+    if not code_info:
+        return jsonify({'error': '兑换码无效'}), 400
+
+    if code_info['type'] != 'cheat' and uid in code_info.get('used', set()):
+        return jsonify({'error': '该兑换码已被使用'}), 400
+
+    # Award
+    shells = code_info.get('shells', 0)
+    pearls = code_info.get('pearls', 0)
+    user['shells'] = user.get('shells', 0) + shells
+    user['pearls'] = user.get('pearls', 0) + pearls
+
+    if code_info['type'] != 'cheat':
+        code_info.setdefault('used', set()).add(uid)
+
+    save_user(uid, user)
+
+    return jsonify({
+        'success': True,
+        'message': code_info.get('description', '兑换成功！'),
+        'reward': {'shells': shells, 'pearls': pearls},
         'user': user
     })
 
@@ -369,5 +553,257 @@ def api_get_creatures():
     return jsonify({'creatures': result, 'total': len(result), 'owned_count': len(owned)})
 
 
+# === Friend System ===
+
+@app.route('/api/friend/search', methods=['POST'])
+def api_friend_search():
+    data = request.json
+    uid = data.get('uid', 'default')
+    keyword = data.get('keyword', '').strip().lower()
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    if not keyword or len(keyword) < 1:
+        return jsonify({'results': []})
+
+    users = load_json('users.json')
+    results = []
+    friends = set(user.get('friends', []))
+    incoming = {r['from'] for r in user.get('incoming_requests', [])}
+    outgoing = {r['to'] for r in user.get('outgoing_requests', [])}
+
+    for other_uid, other in users['users'].items():
+        if other_uid == uid:
+            continue
+        if keyword in other_uid.lower() or keyword in other.get('name', '').lower():
+            level = get_level_info(other.get('total_tasks_completed', 0))
+            if other_uid in friends:
+                relation = 'friend'
+            elif other_uid in incoming:
+                relation = 'incoming_request'
+            elif other_uid in outgoing:
+                relation = 'outgoing_request'
+            else:
+                relation = 'none'
+            results.append({
+                'id': other_uid,
+                'name': other.get('name', ''),
+                'avatar': other.get('avatar', '🐠'),
+                'creature_count': len(other.get('creatures', [])),
+                'shells': other.get('shells', 0),
+                'streak': other.get('streak', 0),
+                'level': level,
+                'relation': relation
+            })
+        if len(results) >= 20:
+            break
+
+    return jsonify({'results': results})
+
+
+@app.route('/api/friend/request', methods=['POST'])
+def api_friend_request():
+    data = request.json
+    uid = data.get('uid', 'default')
+    target_uid = data.get('target_uid', '').strip()
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    if target_uid == uid:
+        return jsonify({'error': '不能添加自己为好友'}), 400
+
+    target = get_user(target_uid)
+    if not target:
+        return jsonify({'error': '目标用户不存在'}), 404
+
+    if target_uid in user.get('friends', []):
+        return jsonify({'error': '已经是好友了'}), 400
+
+    if len(user.get('friends', [])) >= 50:
+        return jsonify({'error': '你的好友已达上限(50)'}), 400
+    if len(target.get('friends', [])) >= 50:
+        return jsonify({'error': '对方好友已达上限(50)'}), 400
+
+    existing_incoming = [r for r in user.get('incoming_requests', []) if r['from'] == target_uid]
+    if existing_incoming:
+        return jsonify({'error': '对方已向你发送了好友请求，请直接接受'}), 400
+
+    existing_outgoing = [r for r in user.get('outgoing_requests', []) if r['to'] == target_uid]
+    if existing_outgoing:
+        return jsonify({'error': '你已向对方发送过请求'}), 400
+
+    now = datetime.now().isoformat()
+    user.setdefault('outgoing_requests', []).append({'to': target_uid, 'timestamp': now})
+    target.setdefault('incoming_requests', []).append({'from': uid, 'timestamp': now})
+
+    save_user(uid, user)
+    save_user(target_uid, target)
+    return jsonify({'success': True})
+
+
+@app.route('/api/friend/accept', methods=['POST'])
+def api_friend_accept():
+    data = request.json
+    uid = data.get('uid', 'default')
+    requester_uid = data.get('requester_uid', '').strip()
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    requester = get_user(requester_uid)
+    if not requester:
+        return jsonify({'error': '请求者不存在'}), 404
+
+    # 验证请求存在
+    req_match = [r for r in user.get('incoming_requests', []) if r['from'] == requester_uid]
+    if not req_match:
+        return jsonify({'error': '没有找到该好友请求'}), 400
+
+    if len(user.get('friends', [])) >= 50:
+        return jsonify({'error': '你的好友已达上限(50)'}), 400
+    if len(requester.get('friends', [])) >= 50:
+        return jsonify({'error': '对方好友已达上限(50)'}), 400
+
+    # 互相加好友
+    user.setdefault('friends', []).append(requester_uid)
+    requester.setdefault('friends', []).append(uid)
+
+    # 清理请求
+    user['incoming_requests'] = [r for r in user.get('incoming_requests', []) if r['from'] != requester_uid]
+    requester['outgoing_requests'] = [r for r in requester.get('outgoing_requests', []) if r['to'] != uid]
+
+    save_user(uid, user)
+    save_user(requester_uid, requester)
+    return jsonify({'success': True})
+
+
+@app.route('/api/friend/reject', methods=['POST'])
+def api_friend_reject():
+    data = request.json
+    uid = data.get('uid', 'default')
+    requester_uid = data.get('requester_uid', '').strip()
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    requester = get_user(requester_uid)
+    if not requester:
+        return jsonify({'error': '请求者不存在'}), 404
+
+    user['incoming_requests'] = [r for r in user.get('incoming_requests', []) if r['from'] != requester_uid]
+    requester['outgoing_requests'] = [r for r in requester.get('outgoing_requests', []) if r['to'] != uid]
+
+    save_user(uid, user)
+    save_user(requester_uid, requester)
+    return jsonify({'success': True})
+
+
+@app.route('/api/friend/cancel', methods=['POST'])
+def api_friend_cancel():
+    data = request.json
+    uid = data.get('uid', 'default')
+    target_uid = data.get('target_uid', '').strip()
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    target = get_user(target_uid)
+    if not target:
+        return jsonify({'error': '目标用户不存在'}), 404
+
+    user['outgoing_requests'] = [r for r in user.get('outgoing_requests', []) if r['to'] != target_uid]
+    target['incoming_requests'] = [r for r in target.get('incoming_requests', []) if r['from'] != uid]
+
+    save_user(uid, user)
+    save_user(target_uid, target)
+    return jsonify({'success': True})
+
+
+@app.route('/api/friend/remove', methods=['POST'])
+def api_friend_remove():
+    data = request.json
+    uid = data.get('uid', 'default')
+    friend_uid = data.get('friend_uid', '').strip()
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    friend = get_user(friend_uid)
+    if not friend:
+        return jsonify({'error': '好友不存在'}), 404
+
+    user['friends'] = [f for f in user.get('friends', []) if f != friend_uid]
+    friend['friends'] = [f for f in friend.get('friends', []) if f != uid]
+
+    save_user(uid, user)
+    save_user(friend_uid, friend)
+    return jsonify({'success': True})
+
+
+@app.route('/api/friend/list', methods=['GET'])
+def api_friend_list():
+    uid = request.args.get('uid', 'default')
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    users = load_json('users.json')
+    result = []
+    for fuid in user.get('friends', []):
+        fuser = users['users'].get(fuid)
+        if fuser:
+            level = get_level_info(fuser.get('total_tasks_completed', 0))
+            result.append({
+                'id': fuid,
+                'name': fuser.get('name', ''),
+                'avatar': fuser.get('avatar', '🐠'),
+                'creature_count': len(fuser.get('creatures', [])),
+                'shells': fuser.get('shells', 0),
+                'streak': fuser.get('streak', 0),
+                'total_tasks': fuser.get('total_tasks_completed', 0),
+                'level': level
+            })
+    return jsonify({'friends': result, 'count': len(result)})
+
+
+@app.route('/api/friend/requests', methods=['GET'])
+def api_friend_requests():
+    uid = request.args.get('uid', 'default')
+    user = get_user(uid)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    users = load_json('users.json')
+    incoming = []
+    for r in user.get('incoming_requests', []):
+        fuser = users['users'].get(r['from'])
+        if fuser:
+            level = get_level_info(fuser.get('total_tasks_completed', 0))
+            incoming.append({
+                'from': r['from'],
+                'name': fuser.get('name', ''),
+                'avatar': fuser.get('avatar', '🐠'),
+                'creature_count': len(fuser.get('creatures', [])),
+                'level': level,
+                'timestamp': r.get('timestamp', '')
+            })
+
+    outgoing = []
+    for r in user.get('outgoing_requests', []):
+        fuser = users['users'].get(r['to'])
+        if fuser:
+            outgoing.append({
+                'to': r['to'],
+                'name': fuser.get('name', ''),
+                'timestamp': r.get('timestamp', '')
+            })
+
+    return jsonify({'incoming': incoming, 'outgoing': outgoing})
+
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', '1') == '1'
+    app.run(debug=debug, host='0.0.0.0', port=port)

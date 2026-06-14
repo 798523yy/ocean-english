@@ -1,3 +1,4 @@
+// app.js - 主控制器（重构后，Auth→auth.js, Collection→collection.js）
 const App = {
     currentPanel: null,
     currentCategory: null,
@@ -13,7 +14,6 @@ const App = {
             this.updateGreeting();
         }, 30000);
 
-        // Check if user is logged in
         const savedUid = localStorage.getItem('ocean_english_uid');
         if (savedUid) {
             API.uid = savedUid;
@@ -37,13 +37,7 @@ const App = {
 
     getTimeInfo() {
         const period = this.getTimePeriod();
-        const info = {
-            dawn: { greeting: 'Good Morning!', sub: '晨间学习', emoji: '🌅', desc: '一日之计在于晨，开启元气满满的一天' },
-            day: { greeting: 'Good Afternoon!', sub: '日间学习', emoji: '☀️', desc: '阳光正好，正是学习好时光' },
-            dusk: { greeting: 'Good Evening!', sub: '傍晚学习', emoji: '🌇', desc: '日落时分，温故而知新' },
-            night: { greeting: 'Good Night!', sub: '夜间学习', emoji: '🌟', desc: '夜深人静，专注学习的好时刻' }
-        };
-        return info[period];
+        return C.TIME_PERIODS[period] || C.TIME_PERIODS.night;
     },
 
     detectTimePeriod() {
@@ -145,38 +139,59 @@ const App = {
             body.className = 'panel-body panel-category blindbox';
             body.innerHTML = `
                 <div class="panel-scene-header">
-                    <h2>🎁 抽取盲盒</h2>
-                    <p class="scene-subtitle">试试手气，收集海洋生物</p>
+                    <h2>🎯 大转盘抽奖</h2>
+                    <p class="scene-subtitle">转动转盘，试试你的运气</p>
                 </div>
+                <!-- 节日活动横幅 -->
+                <div class="festival-banner hidden" id="festival-banner"></div>
+                <!-- 等级选择 -->
                 <div class="box-options" id="box-options">
                     <div class="box-card" data-box="normal" onclick="Blindbox.startOpen('normal')">
-                        <div class="box-icon">📦</div>
+                        <div class="box-icon">🎯</div>
                         <div>
-                            <div class="box-name">普通盲盒</div>
-                            <div class="box-cost">🐚 50</div>
-                            <div class="box-prob">传说 5% | 史诗 10%</div>
+                            <div class="box-name">普通转盘</div>
+                            <div class="box-cost">🐚 ${C.BOX_CONFIG.normal.cost_shells}</div>
+                            <div class="box-prob">稀有15% | 贝壳/珍珠奖励</div>
                         </div>
                     </div>
                     <div class="box-card" data-box="rare" onclick="Blindbox.startOpen('rare')">
-                        <div class="box-icon">🎁</div>
+                        <div class="box-icon">🎰</div>
                         <div>
-                            <div class="box-name">稀有盲盒</div>
-                            <div class="box-cost">🐚 200</div>
-                            <div class="box-prob">传说 10% | 史诗 30%</div>
+                            <div class="box-name">稀有转盘</div>
+                            <div class="box-cost">🐚 ${C.BOX_CONFIG.rare.cost_shells}</div>
+                            <div class="box-prob">史诗10% | 稀有+贝壳奖励</div>
                         </div>
                     </div>
                     <div class="box-card" data-box="legendary" onclick="Blindbox.startOpen('legendary')">
                         <div class="box-icon">👑</div>
                         <div>
-                            <div class="box-name">传说盲盒</div>
-                            <div class="box-cost">🦪 5</div>
-                            <div class="box-prob">传说 40% | 史诗 60%</div>
+                            <div class="box-name">传说转盘</div>
+                            <div class="box-cost">🦪 ${C.BOX_CONFIG.legendary.cost_pearls}</div>
+                            <div class="box-prob">传说40% | 史诗+珍珠奖励</div>
                         </div>
                     </div>
                 </div>
-                <div class="box-animation hidden" id="box-animation"></div>
+                <!-- 转盘 -->
+                <div class="wheel-container hidden" id="wheel-container">
+                    <canvas id="wheel-canvas"></canvas>
+                    <button class="btn-primary wheel-spin-btn" id="wheel-spin-btn">🎯 开始抽奖</button>
+                </div>
+                <!-- 结果 -->
                 <div class="box-result hidden" id="box-result"></div>
             `;
+
+            // 异步检查节日活动
+            Blindbox.checkFestival().then(event => {
+                if (event.active) {
+                    const banner = document.getElementById('festival-banner');
+                    if (banner) {
+                        banner.classList.remove('hidden');
+                        const endDate = new Date(event.end_date + 'T23:59:59');
+                        const daysLeft = Math.ceil((endDate - new Date()) / 86400000);
+                        banner.innerHTML = `${event.emoji} <b>${event.name}活动</b>：传说转盘概率提升至60%！剩余 ${daysLeft} 天`;
+                    }
+                }
+            });
         } else if (type === 'practice') {
             this.renderPracticePanel(body, category);
         }
@@ -231,68 +246,14 @@ const App = {
         this.closePracticeMenu();
     },
 
-    // === Collection / Bestiary ===
+    // === Collection (delegates to Collection module) ===
 
-    _collectionOverlay: null,
-
-    async showCollection() {
-        this.closeCollection();
-        try {
-            const data = await API.getCreatures();
-            this._renderCollection(data);
-        } catch (e) {
-            State.showToast('加载图鉴失败', 'error');
-        }
-    },
-
-    _renderCollection(data) {
-        const creatureEmojis = {
-            clownfish: '🐠', seahorse: '🦑', starfish: '⭐', jellyfish: '🫧',
-            pufferfish: '🐡', turtle: '🐢', octopus: '🐙', stingray: '🦈',
-            dolphin: '🐬', whale: '🐋', shark: '🦈', seadragon: '🐲',
-            mermaid: '🧜‍♀️', narwhal: '🐳', glow_jellyfish: '✨'
-        };
-        const rarityNames = { common: '普通', rare: '稀有', epic: '史诗', legendary: '传说' };
-
-        const overlay = document.createElement('div');
-        overlay.className = 'collection-overlay';
-        overlay.onclick = (e) => { if (e.target === overlay) this.closeCollection(); };
-
-        const creaturesHtml = data.creatures.map(c => {
-            const emoji = creatureEmojis[c.id] || '🐟';
-            const ownedClass = c.owned ? 'owned' : 'locked';
-            return `
-                <div class="collection-creature ${ownedClass}">
-                    ${c.owned ? `<span class="owned-check">✅</span>` : ''}
-                    <span class="creature-emoji">${emoji}</span>
-                    <div class="creature-name">${c.name}</div>
-                    <div class="creature-name-en">${c.name_en}</div>
-                    <span class="creature-rarity-tag rarity-tag-${c.rarity}">${rarityNames[c.rarity]}</span>
-                </div>
-            `;
-        }).join('');
-
-        overlay.innerHTML = `
-            <div class="collection-modal" onclick="event.stopPropagation()">
-                <div class="collection-header">
-                    <button class="collection-close" onclick="App.closeCollection()">✕</button>
-                    <h2>🐋 海洋图鉴</h2>
-                    <p class="collection-progress">已收集 <b>${data.owned_count}</b> / ${data.total} 种海洋生物</p>
-                </div>
-                <div class="collection-grid">${creaturesHtml}</div>
-                <p class="collection-tip">💡 打开盲盒收集更多海洋生物吧！</p>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-        this._collectionOverlay = overlay;
+    showCollection() {
+        Collection.show();
     },
 
     closeCollection() {
-        if (this._collectionOverlay) {
-            this._collectionOverlay.remove();
-            this._collectionOverlay = null;
-        }
+        Collection.close();
     },
 
     // === Checkin ===
@@ -326,101 +287,49 @@ const App = {
     }
 };
 
-// === Auth handler ===
+// === Redeem ===
 
-const Auth = {
-    countdown: 0,
-    timer: null,
+const Redeem = {
+    async submit() {
+        const input = document.getElementById('redeem-code-input');
+        const msgEl = document.getElementById('redeem-msg');
+        const code = input.value.trim();
 
-    async sendCode() {
-        if (this.countdown > 0) return;
-
-        const phone = document.getElementById('login-phone').value.trim();
-        if (phone.length !== 11 || !/^\d{11}$/.test(phone)) {
-            State.showToast('请输入正确的11位手机号', 'error');
+        if (!code) {
+            this._showMsg('请输入兑换码', 'error');
             return;
         }
 
         try {
-            const resp = await fetch('/api/auth/send-code', {
+            const resp = await fetch('/api/redeem', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone })
+                body: JSON.stringify({ uid: API.uid, code })
             });
             const data = await resp.json();
             if (!resp.ok) {
-                State.showToast(data.error || '发送失败', 'error');
-                return;
-            }
-            // For demo: auto-fill the code
-            document.getElementById('login-code').value = data.demo_code || '';
-            State.showToast('验证码已发送 (Demo: 已自动填入)', 'success');
-
-            this.countdown = 60;
-            this.updateCodeBtn();
-            this.timer = setInterval(() => {
-                this.countdown--;
-                this.updateCodeBtn();
-                if (this.countdown <= 0) clearInterval(this.timer);
-            }, 1000);
-        } catch (e) {
-            State.showToast('网络错误', 'error');
-        }
-    },
-
-    updateCodeBtn() {
-        const btn = document.getElementById('send-code-btn');
-        if (!btn) return;
-        if (this.countdown > 0) {
-            btn.textContent = `${this.countdown}s`;
-            btn.disabled = true;
-        } else {
-            btn.textContent = '获取验证码';
-            btn.disabled = false;
-        }
-    },
-
-    async login() {
-        const phone = document.getElementById('login-phone').value.trim();
-        const code = document.getElementById('login-code').value.trim();
-
-        if (!phone || !code) {
-            State.showToast('请输入手机号和验证码', 'error');
-            return;
-        }
-
-        try {
-            const resp = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, code })
-            });
-            const data = await resp.json();
-            if (!resp.ok) {
-                State.showToast(data.error || '登录失败', 'error');
+                this._showMsg(data.error || '兑换失败', 'error');
                 return;
             }
 
-            localStorage.setItem('ocean_english_uid', phone);
-            API.uid = phone;
-            App.onLoginSuccess(data.user, data.level);
+            State.user = data.user;
+            State.updateUI();
+            State.updateProfilePopup();
+            this._showMsg(data.message, 'success');
+            State.showToast(`兑换成功！+🐚${data.reward.shells} +🦪${data.reward.pearls}`, 'reward');
+            input.value = '';
         } catch (e) {
-            State.showToast('网络错误', 'error');
+            this._showMsg('网络错误', 'error');
         }
     },
 
-    logout() {
-        localStorage.removeItem('ocean_english_uid');
-        API.uid = 'default';
-        App.closeProfilePopup();
-        App.closePanel();
-        State.user = null;
-        State.level = null;
-        State.updateUI();
-        document.getElementById('user-name').textContent = '探险家';
-        document.getElementById('user-level-tag').textContent = '';
-        document.getElementById('user-avatar').textContent = '🐠';
-        App.showLogin();
+    _showMsg(msg, type) {
+        const msgEl = document.getElementById('redeem-msg');
+        if (!msgEl) return;
+        msgEl.textContent = msg;
+        msgEl.className = `redeem-msg ${type}`;
+        msgEl.classList.remove('hidden');
+        setTimeout(() => msgEl.classList.add('hidden'), 3000);
     }
 };
 
@@ -440,7 +349,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        if (App._collectionOverlay) App.closeCollection();
+        if (Settings._overlay) Settings.close();
+        else if (Friends._overlay) Friends.close();
+        else if (Collection._overlay) Collection.close();
         else if (App.profileOpen) App.closeProfilePopup();
         else App.closePanel();
     }

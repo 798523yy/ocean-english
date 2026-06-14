@@ -137,29 +137,19 @@ const Interaction = {
         const existing = document.querySelector('.creature-info-card');
         if (existing) existing.remove();
 
-        const rarityNames = { common: '普通', rare: '稀有', epic: '史诗', legendary: '传说' };
-        const rarityColors = {
-            common: '#9E9E9E', rare: '#4FC3F7', epic: '#AB47BC', legendary: '#FFD700'
-        };
-        const creatureEmojis = {
-            clownfish: '🐠', seahorse: '🦑', starfish: '⭐', jellyfish: '🫧',
-            pufferfish: '🐡', turtle: '🐢', octopus: '🐙', stingray: '🦈',
-            dolphin: '🐬', whale: '🐋', shark: '🦈', seadragon: '🐲',
-            mermaid: '🧜‍♀️', narwhal: '🐳', glow_jellyfish: '✨'
-        };
 
         const card = document.createElement('div');
         card.className = 'creature-info-card';
         card.innerHTML = `
-            <div class="cic-header" style="border-color:${rarityColors[creature.rarity]}">
-                <span class="cic-emoji">${creatureEmojis[creature.id] || '🐟'}</span>
+            <div class="cic-header" style="border-color:${C.RARITY_COLORS[creature.rarity]}">
+                <span class="cic-emoji">${C.CREATURE_EMOJIS[creature.id] || C.DEFAULT_CREATURE_EMOJI}</span>
                 <div class="cic-names">
                     <span class="cic-name">${creature.name}</span>
                     <span class="cic-name-en">${creature.name_en}</span>
                 </div>
             </div>
             <div class="cic-body">
-                <span class="cic-rarity" style="background:${rarityColors[creature.rarity]}">${rarityNames[creature.rarity]}</span>
+                <span class="cic-rarity" style="background:${C.RARITY_COLORS[creature.rarity]}">${C.RARITY_NAMES[creature.rarity]}</span>
                 <p class="cic-desc">${creature.description}</p>
             </div>
         `;

@@ -42,11 +42,8 @@ const Aquarium = {
             console.error('Failed to load aquarium:', e);
         }
 
-        // 初始化子模块
-        const creatureIds = this.creatures.map(c => c.id);
-        SpriteManager.preload(creatureIds).then(() => {
-            this.fadeInSprites();
-        });
+        // 初始化子模块（emoji无需预加载）
+        this.spriteAlpha = 1;
 
         SwimAI.init(this.layout, this.creatures, this.width, this.height);
         ParticleManager.init(this.width, this.height);
@@ -62,7 +59,7 @@ const Aquarium = {
 
         this.weather = this.randomWeather();
         this.weatherTimer = 0;
-        this.weatherDuration = 120000 + Math.random() * 180000; // 2-5 min
+        this.weatherDuration = 30000 + Math.random() * 60000; // 30-90秒切换一次
 
         if (!this.initialized) {
             this.initialized = true;
@@ -310,16 +307,16 @@ const Aquarium = {
         if (this.weatherTimer > this.weatherDuration) {
             this.weather = this.randomWeather();
             this.weatherTimer = 0;
-            this.weatherDuration = 120000 + Math.random() * 180000;
+            this.weatherDuration = 30000 + Math.random() * 60000; // 30-90秒
         }
 
         // Rain particles
         if (this.weather === 'rainy') {
-            if (Math.random() < 0.3) {
+            if (Math.random() < 0.25) {
                 ParticleManager.emit('rain', Math.random() * this.width, -10, {});
             }
         } else if (this.weather === 'stormy') {
-            if (Math.random() < 0.7) {
+            if (Math.random() < 0.3) {
                 ParticleManager.emit('rain', Math.random() * this.width, -10, {});
             }
             // Lightning

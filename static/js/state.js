@@ -38,7 +38,7 @@ const State = {
         document.getElementById('pearl-count').textContent = u.pearls || 0;
         document.getElementById('streak-count').textContent = u.streak || 0;
         document.getElementById('user-name').textContent = u.name || '探险家';
-        document.getElementById('user-avatar').textContent = this.level ? this.level.emoji : '🐠';
+        document.getElementById('user-avatar').textContent = u.avatar || this.level ? this.level.emoji : '🐠';
 
         // Collection count
         const collectedEl = document.getElementById('collected-count');
@@ -83,7 +83,7 @@ const State = {
         const popup = document.getElementById('profile-popup');
         if (!popup || popup.classList.contains('hidden')) return;
 
-        document.getElementById('profile-avatar').textContent = lv ? lv.emoji : '🐠';
+        document.getElementById('profile-avatar').textContent = u.avatar || (lv ? lv.emoji : '🐠');
         document.getElementById('profile-name').textContent = u.name || '探险家';
 
         if (lv) {

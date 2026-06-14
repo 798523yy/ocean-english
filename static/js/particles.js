@@ -129,8 +129,8 @@ const ParticleManager = {
                     type: 'rain',
                     x: x || Math.random() * 2000,
                     y: y || -10 - Math.random() * 200,
-                    length: 8 + Math.random() * 14,
-                    alpha: 0.15 + Math.random() * 0.25,
+                    length: 10 + Math.random() * 18,
+                    alpha: 0.25 + Math.random() * 0.35,
                     speedY: 6 + Math.random() * 8,
                     speedX: -0.5 - Math.random() * 1.5,
                     life: Infinity,
@@ -308,8 +308,8 @@ const ParticleManager = {
                     break;
 
                 case 'rain':
-                    ctx.strokeStyle = `rgba(180, 210, 240, ${p.alpha})`;
-                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = `rgba(160, 200, 240, ${p.alpha})`;
+                    ctx.lineWidth = 1.5;
                     ctx.beginPath();
                     ctx.moveTo(p.x, p.y);
                     ctx.lineTo(p.x + p.speedX * 2, p.y - p.length);

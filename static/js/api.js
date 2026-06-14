@@ -48,5 +48,43 @@ const API = {
 
     async getCreatures() {
         return this.request('GET', `/creatures?uid=${this.uid}`);
+    },
+
+    // === Friend ===
+
+    async friendSearch(keyword) {
+        return this.request('POST', '/friend/search', { uid: this.uid, keyword });
+    },
+
+    async friendSendRequest(targetUid) {
+        return this.request('POST', '/friend/request', { uid: this.uid, target_uid: targetUid });
+    },
+
+    async friendAcceptRequest(requesterUid) {
+        return this.request('POST', '/friend/accept', { uid: this.uid, requester_uid: requesterUid });
+    },
+
+    async friendRejectRequest(requesterUid) {
+        return this.request('POST', '/friend/reject', { uid: this.uid, requester_uid: requesterUid });
+    },
+
+    async friendCancelRequest(targetUid) {
+        return this.request('POST', '/friend/cancel', { uid: this.uid, target_uid: targetUid });
+    },
+
+    async friendRemoveFriend(friendUid) {
+        return this.request('POST', '/friend/remove', { uid: this.uid, friend_uid: friendUid });
+    },
+
+    async getFriendList() {
+        return this.request('GET', `/friend/list?uid=${this.uid}`);
+    },
+
+    async getFriendRequests() {
+        return this.request('GET', `/friend/requests?uid=${this.uid}`);
+    },
+
+    async updateProfile(name, avatar) {
+        return this.request('POST', '/user/profile', { uid: this.uid, name, avatar });
     }
 };

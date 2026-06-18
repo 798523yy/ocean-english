@@ -12,6 +12,17 @@ const ParticleManager = {
         for (let i = 0; i < this.maxBubbles / 2; i++) {
             this.spawnBubble(width, height);
         }
+        // 4条水下光柱
+        for (let i = 0; i < 4; i++) {
+            this.particles.push({
+                type: 'lightray',
+                x: width * (0.2 + i * 0.2),
+                width: 40 + Math.random() * 30,
+                alpha: 0.03 + Math.random() * 0.04,
+                phase: Math.random() * Math.PI * 2,
+                life: Infinity,
+            });
+        }
     },
 
     spawnPlankton(width, height) {
@@ -227,6 +238,12 @@ const ParticleManager = {
                     if (p.age > p.life) this.particles.splice(i, 1);
                     break;
 
+                case 'lightray':
+                    p.phase += 0.005 * (dt / 16);
+                    // x 随水面波动偏移
+                    p.x += Math.sin(p.phase) * 0.15 * (dt / 16);
+                    break;
+
                 case 'ripple':
                 case 'surface_ripple':
                     p.age += dt;
@@ -250,6 +267,25 @@ const ParticleManager = {
             ctx.save();
 
             switch (p.type) {
+                case 'lightray':
+                    const height = this._refHeight || 800;
+                    ctx.save();
+                    const grad = ctx.createLinearGradient(p.x, 0, p.x, height * 0.6);
+                    grad.addColorStop(0, `rgba(255, 255, 220, ${p.alpha * 1.2})`);
+                    grad.addColorStop(0.5, `rgba(255, 255, 220, ${p.alpha * 0.5})`);
+                    grad.addColorStop(1, `rgba(255, 255, 220, 0)`);
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    const sway = Math.sin(p.phase) * 15;
+                    ctx.moveTo(p.x - p.width / 2, 0);
+                    ctx.lineTo(p.x + p.width / 2, 0);
+                    ctx.lineTo(p.x + p.width / 2 + sway * 2, height * 0.6);
+                    ctx.lineTo(p.x - p.width / 2 + sway * 2, height * 0.6);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                    break;
+
                 case 'plankton':
                     const glowAlpha = p.alpha * (0.5 + 0.5 * Math.sin(p.alphaPhase));
                     ctx.fillStyle = `rgba(180, 220, 255, ${glowAlpha})`;

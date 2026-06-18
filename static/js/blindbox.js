@@ -65,7 +65,10 @@ const Blindbox = {
             spinBtn.textContent = '转动中...';
         }
 
+        if (typeof Sound !== 'undefined') Sound.playWheelStart();
+
         Wheel.spin(boxType, this.isFestival, async (segment) => {
+            if (typeof Sound !== 'undefined') Sound.playWheelStop();
             await this.handleResult(boxType, segment);
         });
     },
@@ -126,8 +129,9 @@ const Blindbox = {
             </div>
         `;
 
-        // 传说级庆祝：烟花 + 金边闪烁
+        // 传说级庆祝：烟花 + 金边闪烁 + 音效
         if (isLegendary) {
+            if (typeof Sound !== 'undefined') Sound.playLegendary();
             const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
             if (typeof ParticleManager !== 'undefined') {
                 ParticleManager.emit('firework', cx, cy, { count: 60, colors: ['#FFD700', '#FFD700', '#FFEB3B', '#FFF', '#FFD700', '#FFA500'] });

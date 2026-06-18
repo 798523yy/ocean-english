@@ -52,6 +52,9 @@ const Aquarium = {
         Interaction.setLayoutRefs(this.layout, this.creatures);
         Lighting.init();
 
+        // 水下环境音
+        if (typeof Sound !== 'undefined') Sound.startAmbient();
+
         // 移动端降级
         if (window.innerWidth < 768) {
             ParticleManager.setCapacity(15, 12);
@@ -60,6 +63,7 @@ const Aquarium = {
         this.weather = this.randomWeather();
         this.weatherTimer = 0;
         this.weatherDuration = 30000 + Math.random() * 60000; // 30-90秒切换一次
+        if (typeof Sound !== 'undefined') Sound.setWeather(this.weather);
 
         if (!this.initialized) {
             this.initialized = true;
@@ -351,9 +355,14 @@ const Aquarium = {
     updateWeather(dt) {
         this.weatherTimer += dt;
         if (this.weatherTimer > this.weatherDuration) {
+            const prevWeather = this.weather;
             this.weather = this.randomWeather();
             this.weatherTimer = 0;
             this.weatherDuration = 30000 + Math.random() * 60000; // 30-90秒
+            // 天气音效切换
+            if (this.weather !== prevWeather && typeof Sound !== 'undefined') {
+                Sound.setWeather(this.weather);
+            }
         }
 
         // Rain particles

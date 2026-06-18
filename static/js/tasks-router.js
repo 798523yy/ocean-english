@@ -92,7 +92,8 @@ const Tasks = {
             State.updateUI();
             State.updateProfilePopup();
             this.closeModal();
-            // 任务完成撒花
+            // 任务完成音效 + 撒花
+            if (typeof Sound !== 'undefined') Sound.playTaskComplete();
             if (typeof ParticleManager !== 'undefined') {
                 const cx = window.innerWidth / 2, cy = window.innerHeight * 0.35;
                 ParticleManager.emit('firework', cx, cy, { count: 30, colors: ['#FFD700', '#00FFC8', '#C77DFF', '#FF9800', '#FFF'] });

@@ -200,6 +200,7 @@ const Wheel = {
 		const startAngle = this.currentAngle;
 		const startTime = performance.now();
 		const duration = 4000 + Math.random() * 1000;
+		let lastTickSeg = Math.floor(((this.currentAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / arcSize);
 
 		const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
@@ -208,7 +209,18 @@ const Wheel = {
 			const progress = Math.min(elapsed / duration, 1);
 			const easedProgress = easeOutCubic(progress);
 
+
+
 			this.currentAngle = startAngle + totalRotation * easedProgress;
+
+			// Tick sound when crossing segment boundary
+			const normAngle = ((this.currentAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+			const curSeg = Math.floor(normAngle / arcSize);
+			if (curSeg !== lastTickSeg && typeof Sound !== 'undefined') {
+				Sound.playWheelTick();
+				lastTickSeg = curSeg;
+			}
+
 			this.draw(boxType, isFestival);
 
 			if (progress < 1) {

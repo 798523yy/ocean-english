@@ -44,6 +44,8 @@ const App = {
         const period = this.getTimePeriod();
         document.body.className = document.body.className.replace(/time-\w+/g, '');
         document.body.classList.add(`time-${period}`);
+        // 时段背景音乐
+        if (typeof Sound !== 'undefined') Sound.updateMusic(period);
         return period;
     },
 
@@ -281,6 +283,8 @@ const App = {
             if (result.streak >= 30) {
                 setTimeout(() => ParticleManager.emit('firework', cx + 80, cy - 40, { count: 40, colors: ['#FFD700', '#FFD700', '#FFEB3B', '#FFF', '#FFD700'] }), 800);
             }
+            // 签到音效
+            if (typeof Sound !== 'undefined') Sound.playCheckin();
             State.showToast(msg, 'reward', '🎉');
             if (btn) {
                 btn.classList.add('checked');

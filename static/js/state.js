@@ -87,6 +87,9 @@ const State = {
         `;
         document.body.appendChild(overlay);
 
+        // 升级音效
+        if (typeof Sound !== 'undefined') Sound.playLevelUp();
+
         // 烟花
         const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
         if (typeof ParticleManager !== 'undefined') {
@@ -153,6 +156,11 @@ const State = {
         if (existing.length >= 3) {
             existing[0].remove();
         }
+
+        // 音效
+        if (type === 'success' && typeof Sound !== 'undefined') Sound.playSuccess();
+        else if (type === 'error' && typeof Sound !== 'undefined') Sound.playError();
+        else if (type === 'reward' && typeof Sound !== 'undefined') Sound.playReward();
 
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;

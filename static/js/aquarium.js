@@ -138,6 +138,7 @@ const Aquarium = {
 
         // 1. 背景
         this.drawBackground(ctx);
+        this.drawWaterSurface(ctx);
 
         // 2. 水面焦散
         Lighting.drawCaustics(ctx, this.width, this.height, this.time);
@@ -147,6 +148,11 @@ const Aquarium = {
 
         // 4. 环境装饰
         Environment.draw(ctx, this.time);
+
+        // 沙地气泡
+        if (Math.random() < 0.015) {
+            ParticleManager.emit('bubble', Math.random() * this.width, this.height - 50, {});
+        }
 
         // 环境微粒
         if (Math.random() < 0.08) {
@@ -216,6 +222,30 @@ const Aquarium = {
         }
     },
 
+    drawWaterSurface(ctx) {
+        const t = this.time;
+        ctx.save();
+        const surfGrad = ctx.createLinearGradient(0, 0, 0, 45);
+        surfGrad.addColorStop(0, 'rgba(120, 200, 220, 0.25)');
+        surfGrad.addColorStop(0.5, 'rgba(80, 160, 200, 0.12)');
+        surfGrad.addColorStop(1, 'rgba(0, 100, 160, 0)');
+        ctx.fillStyle = surfGrad;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        for (let x = 0; x <= this.width; x += 4) {
+            const y = 8 + Math.sin(x * 0.01 + t * 0.6) * 7
+                    + Math.sin(x * 0.03 + t * 1.2) * 4
+                    + Math.sin(x * 0.06 - t * 0.8) * 2;
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(this.width, 45);
+        ctx.lineTo(0, 45);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    },
+
     drawSand(ctx) {
         const c = Lighting.getColors();
         const sandY = this.height - 50;
@@ -228,7 +258,8 @@ const Aquarium = {
         ctx.beginPath();
         ctx.moveTo(0, sandY);
         for (let x = 0; x <= this.width; x += 12) {
-            const y = sandY + Math.sin(x * 0.015) * 10 + Math.sin(x * 0.04 + 1) * 6;
+            const y = sandY + Math.sin(x * 0.015 + this.time * 0.2) * 10
+                    + Math.sin(x * 0.04 + this.time * 0.35 + 1) * 6;
             ctx.lineTo(x, y);
         }
         ctx.lineTo(this.width, this.height);

@@ -310,7 +310,12 @@ const Aquarium = {
                 alpha *= 0.6;
             }
 
-            toDraw.push({ s, creature, y: s.y, alpha });
+            const sizeVariation = creature._sizeVar !== undefined ? creature._sizeVar : (() => {
+                creature._sizeVar = 0.85 + Math.random() * 0.3;
+                return creature._sizeVar;
+            })();
+
+            toDraw.push({ s, creature, y: s.y, alpha, scale: sizeVariation });
         }
         toDraw.sort((a, b) => a.y - b.y);
 
@@ -324,14 +329,14 @@ const Aquarium = {
             const facingRight = Math.cos(item.s.angle) > 0;
             if (!facingRight) ctx.scale(-1, 1);
 
-            SpriteManager.draw(ctx, item.creature, 0, 0, 1, item.alpha, this.time);
+            SpriteManager.draw(ctx, item.creature, 0, 0, item.scale, item.alpha, this.time);
             ctx.restore();
 
             // 尾迹
-            if (item.s.speed > 0.3 && Math.random() < 0.3) {
-                const trailX = item.s.x - Math.cos(item.s.angle) * item.creature.size * 0.5;
-                const trailY = item.s.y - Math.sin(item.s.angle) * item.creature.size * 0.5;
-                ParticleManager.emit('trail', trailX, trailY, { count: 1 });
+            if (item.s.speed > 0.2 && Math.random() < Math.min(0.5, item.s.speed * 0.6)) {
+                const trailX = item.s.x - Math.cos(item.s.angle) * item.creature.size * 0.6;
+                const trailY = item.s.y - Math.sin(item.s.angle) * item.creature.size * 0.6;
+                ParticleManager.emit('trail', trailX, trailY, { count: item.s.speed > 0.6 ? 2 : 1 });
             }
         }
     },

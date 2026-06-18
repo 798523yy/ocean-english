@@ -104,17 +104,18 @@ const Lighting = {
         if (alpha < 0.01) return;
 
         ctx.save();
-        ctx.globalAlpha = alpha;
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 35; i++) {  // 20 → 35
             const cx = ((i * 197 + 31) % 1000) / 1000 * width;
-            const cy = 20 + Math.sin(t * 0.8 + i * 1.7) * 40 + (i * 37) % 200;
-            const rx = 20 + Math.sin(t * 0.5 + i) * 10 + (i * 13) % 40;
-            const ry = 8 + Math.cos(t * 0.6 + i) * 4;
+            const depth = 0.1 + (i / 35) * 0.7;
+            const y = height * 0.1 + depth * height * 0.5 + Math.sin(t * 0.5 + i * 1.3) * 30;
+            const rx = 25 + Math.sin(t * 0.4 + i) * 12 + (i * 13) % 50;
+            const ry = 6 + Math.cos(t * 0.5 + i) * 3;
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            const depthAlpha = alpha * (1 - depth * 0.5);
+            ctx.fillStyle = `rgba(255, 255, 255, ${depthAlpha * 2})`;
             ctx.beginPath();
-            ctx.ellipse(cx, cy, rx, ry, 0.2 + Math.sin(t * 0.3 + i) * 0.3, 0, Math.PI * 2);
+            ctx.ellipse(cx, y, rx, ry, 0.2 + Math.sin(t * 0.25 + i) * 0.3, 0, Math.PI * 2);
             ctx.fill();
         }
 

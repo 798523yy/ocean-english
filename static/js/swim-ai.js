@@ -82,6 +82,7 @@ const SwimAI = {
                 case 'pausing': this.updatePausing(s, dt); break;
                 case 'turning': this.updateTurning(s, dt); break;
                 case 'feeding': this.updateFeeding(s, dt); break;
+                case 'dashing': this.updateDashing(s, dt); break;
             }
 
             this.checkBounds(s);
@@ -94,6 +95,15 @@ const SwimAI = {
     },
 
     updateFree(s, dt, schoolGroups) {
+        // 冲刺
+        if (Math.random() < 0.0003) {
+            s.state = 'dashing';
+            s.stateTimer = 0;
+            s.dashAngle = s.angle + (Math.random() - 0.5) * 0.6;
+            s.dashDuration = 600 + Math.random() * 800;
+            return;
+        }
+
         if (!s.targetX || Math.random() < 0.002) {
             s.targetX = 100 + Math.random() * (this.canvasWidth - 200);
             s.targetY = 80 + Math.random() * (this.canvasHeight - 200);
@@ -126,9 +136,31 @@ const SwimAI = {
             }
         }
 
+        // 弱聚群
+        if (s.schooling && schoolGroups[s.creatureId] && schoolGroups[s.creatureId].length >= 2) {
+            let cx = 0, cy = 0, count = 0;
+            for (const mid of schoolGroups[s.creatureId]) {
+                if (mid !== stateId) {
+                    const other = this.states[mid];
+                    if (other && other.state === 'free') {
+                        cx += other.x; cy += other.y; count++;
+                    }
+                }
+            }
+            if (count > 0) {
+                cx /= count; cy /= count;
+                const toCenterX = cx - s.x;
+                const toCenterY = cy - s.y;
+                s.x += toCenterX * 0.0002 * (dt / 16);
+                s.y += toCenterY * 0.0002 * (dt / 16);
+            }
+        }
+
         s.x += Math.cos(s.angle) * s.speed * 0.3;
         s.y += Math.sin(s.angle) * s.speed * 0.3;
         s.angle += (Math.random() - 0.5) * s.turnRate * 0.1;
+        // 浮动
+        s.y += Math.sin(s.stateTimer * 0.003 + s.wobblePhase) * 0.15 * (dt / 16);
     },
 
     updateMoving(s, dt) {
@@ -146,19 +178,23 @@ const SwimAI = {
         }
 
         const targetAngle = Math.atan2(dy, dx);
-        const angleDiff = targetAngle - s.angle;
-        const normalizedDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
-        s.angle += normalizedDiff * s.turnRate * (dt / 16);
+        let angleDiff = targetAngle - s.angle;
+        angleDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
+        const turnAmount = Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), s.turnRate * 1.5 * (dt / 16));
+        s.angle += turnAmount;
 
         const speedFactor = Math.min(1, dist / 150);
-        s.speed = s.baseSpeed * (0.5 + 0.5 * speedFactor);
+        const easeFactor = speedFactor < 0.5
+            ? 2 * speedFactor * speedFactor
+            : 1 - Math.pow(-2 * speedFactor + 2, 2) / 2;
+        s.speed = s.baseSpeed * (0.3 + 0.7 * easeFactor);
         s.x += Math.cos(s.angle) * s.speed * (dt / 16);
         s.y += Math.sin(s.angle) * s.speed * (dt / 16);
     },
 
     updatePausing(s, dt) {
-        s.x += Math.sin(s.stateTimer * 0.003 + s.wobblePhase) * 0.1;
-        s.y += Math.cos(s.stateTimer * 0.004 + s.wobblePhase) * 0.1;
+        s.x += Math.sin(s.stateTimer * 0.003 + s.wobblePhase) * 0.2 * (dt / 16);
+        s.y += Math.cos(s.stateTimer * 0.004 + s.wobblePhase) * 0.2 * (dt / 16);
         if (s.stateTimer > s.pauseDuration) s.state = 'free';
     },
 
@@ -186,6 +222,15 @@ const SwimAI = {
         if (dist < 30) {
             s.state = 'pausing';
             s.pauseDuration = 2000;
+            s.stateTimer = 0;
+        }
+    },
+
+    updateDashing(s, dt) {
+        s.x += Math.cos(s.dashAngle) * s.baseSpeed * 2.5 * (dt / 16);
+        s.y += Math.sin(s.dashAngle) * s.baseSpeed * 2.5 * (dt / 16);
+        if (s.stateTimer > s.dashDuration) {
+            s.state = 'free';
             s.stateTimer = 0;
         }
     },

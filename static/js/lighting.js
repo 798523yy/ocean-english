@@ -127,8 +127,8 @@ const Lighting = {
         switch (creature.rarity) {
             case 'legendary':
                 glowColor = creature.id === 'glow_jellyfish' ? '0, 255, 200' : '255, 215, 0';
-                glowSize = creature.size * scale * 0.6;
-                glowAlpha = 0.3 + Math.sin(t * 2) * 0.15;
+                glowSize = creature.size * scale * 0.7;
+                glowAlpha = 0.25 + Math.sin(t * 2) * 0.2;
                 break;
             case 'epic':
                 glowColor = '170, 136, 255';

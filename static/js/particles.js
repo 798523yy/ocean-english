@@ -160,6 +160,23 @@ const ParticleManager = {
                     branches: 2 + Math.floor(Math.random() * 3),
                 });
                 break;
+
+            case 'sparkle':
+                for (let i = 0; i < (options.count || 3); i++) {
+                    this.particles.push({
+                        type: 'sparkle',
+                        x: x + (Math.random() - 0.5) * 20,
+                        y: y + (Math.random() - 0.5) * 20,
+                        size: 0.5 + Math.random() * 1.5,
+                        alpha: 0.4 + Math.random() * 0.4,
+                        speedY: -0.2 - Math.random() * 0.3,
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        life: 1500 + Math.random() * 1500,
+                        age: 0,
+                        color: options.color || '200, 220, 255',
+                    });
+                }
+                break;
         }
     },
 
@@ -250,6 +267,13 @@ const ParticleManager = {
                     const progress = p.age / p.life;
                     p.radius = p.maxRadius * progress;
                     p.alpha = p.alpha * (1 - progress);
+                    if (p.age > p.life) this.particles.splice(i, 1);
+                    break;
+
+                case 'sparkle':
+                    p.age += dt;
+                    p.y += p.speedY * (dt / 16);
+                    p.x += p.speedX * (dt / 16);
                     if (p.age > p.life) this.particles.splice(i, 1);
                     break;
             }
@@ -371,6 +395,17 @@ const ParticleManager = {
                         ctx.lineTo(lx, ly);
                     }
                     ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    break;
+
+                case 'sparkle':
+                    const sRatio = 1 - p.age / p.life;
+                    ctx.fillStyle = `rgba(${p.color}, ${p.alpha * sRatio})`;
+                    ctx.shadowColor = `rgba(${p.color}, ${p.alpha * sRatio})`;
+                    ctx.shadowBlur = p.size * 4;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * sRatio, 0, Math.PI * 2);
+                    ctx.fill();
                     ctx.shadowBlur = 0;
                     break;
             }

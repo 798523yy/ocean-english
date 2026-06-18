@@ -148,6 +148,16 @@ const Aquarium = {
         // 4. 环境装饰
         Environment.draw(ctx, this.time);
 
+        // 环境微粒
+        if (Math.random() < 0.08) {
+            const coral = Environment.corals[Math.floor(Math.random() * Environment.corals.length)];
+            if (coral) ParticleManager.emit('sparkle', coral.x, coral.y - 20, { count: 2, color: '180, 255, 220' });
+        }
+        if (Math.random() < 0.05) {
+            const anemone = Environment.anemones[Math.floor(Math.random() * Environment.anemones.length)];
+            if (anemone) ParticleManager.emit('sparkle', anemone.x, anemone.y - 10, { count: 1, color: '255, 180, 255' });
+        }
+
         // 5. 粒子
         ParticleManager.update(dt, this.width, this.height);
         ParticleManager.draw(ctx);

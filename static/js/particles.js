@@ -2,7 +2,7 @@
 const ParticleManager = {
     particles: [],
     maxPlankton: 30,
-    maxBubbles: 25,
+    maxBubbles: 40,
 
     init(width, height) {
         this.particles = [];
@@ -32,12 +32,13 @@ const ParticleManager = {
         this.particles.push({
             type: 'bubble',
             x: Math.random() * width,
-            y: height + Math.random() * 40,
-            size: 2 + Math.random() * 5,
-            alpha: 0.15 + Math.random() * 0.2,
-            speedY: -0.3 - Math.random() * 0.7,
+            y: height - 50 + Math.random() * 30,  // 从沙地附近冒出
+            size: 1.5 + Math.random() * 7,         // 大小更丰富
+            alpha: 0.1 + Math.random() * 0.25,
+            speedY: -0.4 - Math.random() * 1.0,
             wobble: Math.random() * Math.PI * 2,
-            wobbleSpeed: 0.01 + Math.random() * 0.02,
+            wobbleSpeed: 0.01 + Math.random() * 0.03,
+            wobbleAmp: 0.2 + Math.random() * 0.6, // 摇摆幅度
             life: Infinity,
         });
     },
@@ -173,13 +174,15 @@ const ParticleManager = {
                 case 'bubble':
                     p.y += p.speedY * (dt / 16);
                     p.wobble += p.wobbleSpeed * (dt / 16);
-                    p.x += Math.sin(p.wobble) * 0.3 * (dt / 16);
-                    if (p.y < -20) {
-                        if (Math.random() < 0.3) {
-                            this.emit('surface_ripple', p.x, 30, {});
-                        }
-                        p.y = height + 10 + Math.random() * 30;
+                    p.x += Math.sin(p.wobble) * p.wobbleAmp * (dt / 16);  // 水平摇摆
+                    // 到水面爆裂
+                    if (p.y < 40) {
+                        this.emit('surface_ripple', p.x, 35, {});
+                        p.y = height - 50 + Math.random() * 30;
                         p.x = Math.random() * width;
+                        // 随机大小
+                        p.size = 1.5 + Math.random() * 7;
+                        p.wobbleAmp = 0.2 + Math.random() * 0.6;
                     }
                     break;
 
@@ -256,16 +259,15 @@ const ParticleManager = {
                     break;
 
                 case 'bubble':
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${p.alpha})`;
-                    ctx.lineWidth = 0.8;
+                    ctx.strokeStyle = `rgba(200, 230, 255, ${p.alpha})`;
+                    ctx.lineWidth = 0.6;
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                     ctx.stroke();
-                    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.3})`;
-                    ctx.fill();
-                    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.6})`;
+                    // 内部亮点
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.5})`;
                     ctx.beginPath();
-                    ctx.arc(p.x - p.size * 0.25, p.y - p.size * 0.25, p.size * 0.25, 0, Math.PI * 2);
+                    ctx.arc(p.x - p.size * 0.2, p.y - p.size * 0.2, p.size * 0.3, 0, Math.PI * 2);
                     ctx.fill();
                     break;
 

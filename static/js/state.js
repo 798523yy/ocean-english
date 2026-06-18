@@ -3,6 +3,7 @@ const State = {
     level: null,
     creatureList: [],
     todayTasks: {},
+    _lastLevelMin: 0,
 
     async init() {
         try {
@@ -61,6 +62,44 @@ const State = {
 
         this.todayTasks = u.today_tasks || {};
         this.updateCheckinState();
+
+        // 检测等级升级
+        const newMin = this.level ? this.level.min : 0;
+        if (newMin > this._lastLevelMin && this._lastLevelMin > 0) {
+            this._showLevelUp();
+        }
+        this._lastLevelMin = newMin;
+    },
+
+    _showLevelUp() {
+        const lv = this.level;
+        if (!lv) return;
+
+        // 全屏庆祝 overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'levelup-overlay';
+        overlay.innerHTML = `
+            <div class="levelup-content">
+                <div class="levelup-emoji">${lv.emoji}</div>
+                <div class="levelup-title">${lv.title}</div>
+                <div class="levelup-sub">${lv.title_en || ''}</div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        // 烟花
+        const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+        if (typeof ParticleManager !== 'undefined') {
+            ParticleManager.emit('firework', cx, cy, { count: 60 });
+            setTimeout(() => ParticleManager.emit('firework', cx - 100, cy - 60, { count: 40 }), 500);
+            setTimeout(() => ParticleManager.emit('firework', cx + 100, cy - 60, { count: 40 }), 1000);
+        }
+
+        // 动画结束后清理
+        setTimeout(() => {
+            overlay.classList.add('fading');
+            setTimeout(() => overlay.remove(), 500);
+        }, 2500);
     },
 
     updateCheckinState() {
@@ -100,13 +139,37 @@ const State = {
         document.getElementById('pstat-phone').textContent = u.phone ? u.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '-';
     },
 
-    showToast(msg, type = '') {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.className = `toast ${type} show`;
-        clearTimeout(toast._timeout);
+    showToast(msg, type = '', icon = '') {
+        // 获取或创建 toast 容器
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        // 限制最多 3 条，超出移除最早
+        const existing = container.querySelectorAll('.toast');
+        if (existing.length >= 3) {
+            existing[0].remove();
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        if (icon) {
+            toast.innerHTML = `<span class="toast-icon">${icon}</span>${msg}`;
+        } else {
+            toast.textContent = msg;
+        }
+        container.appendChild(toast);
+
+        // 动态时长：按消息长度
+        const len = msg.length;
+        const duration = len < 10 ? 2000 : len < 25 ? 2500 : 3500;
+
         toast._timeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2000);
+            toast.classList.add('hiding');
+            setTimeout(() => toast.remove(), 250);
+        }, duration);
     }
 };

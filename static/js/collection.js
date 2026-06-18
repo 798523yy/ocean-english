@@ -20,13 +20,30 @@ const Collection = {
         const creaturesHtml = data.creatures.map(c => {
             const emoji = C.CREATURE_EMOJIS[c.id] || C.DEFAULT_CREATURE_EMOJI;
             const ownedClass = c.owned ? 'owned' : 'locked';
-            return `
-                <div class="collection-creature ${ownedClass}">
-                    ${c.owned ? `<span class="owned-check">✅</span>` : ''}
-                    <span class="creature-emoji">${emoji}</span>
+            const ownedAttr = c.owned ? `onclick="Collection.flipCard(this)"` : '';
+            const inner = c.owned
+                ? `<div class="card-inner">
+                    <div class="card-front">
+                        <span class="owned-check">✅</span>
+                        <span class="creature-emoji">${emoji}</span>
+                        <div class="creature-name">${c.name}</div>
+                        <div class="creature-name-en">${c.name_en}</div>
+                        <span class="creature-rarity-tag rarity-tag-${c.rarity}">${C.RARITY_NAMES[c.rarity]}</span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-back-en">${c.name_en}</span>
+                        <span class="creature-rarity-tag rarity-tag-${c.rarity}">${C.RARITY_NAMES[c.rarity]}</span>
+                        <span class="card-back-desc">${c.description || ''}</span>
+                        <span class="card-back-hint">🖱️ 点击翻回</span>
+                    </div>
+                   </div>`
+                : `<span class="creature-emoji">${emoji}</span>
                     <div class="creature-name">${c.name}</div>
                     <div class="creature-name-en">${c.name_en}</div>
-                    <span class="creature-rarity-tag rarity-tag-${c.rarity}">${C.RARITY_NAMES[c.rarity]}</span>
+                    <span class="creature-rarity-tag rarity-tag-${c.rarity}">${C.RARITY_NAMES[c.rarity]}</span>`;
+            return `
+                <div class="collection-creature ${ownedClass}" ${ownedAttr}>
+                    ${inner}
                 </div>
             `;
         }).join('');
@@ -45,6 +62,10 @@ const Collection = {
 
         document.body.appendChild(overlay);
         this._overlay = overlay;
+    },
+
+    flipCard(el) {
+        el.classList.toggle('flipped');
     },
 
     close() {

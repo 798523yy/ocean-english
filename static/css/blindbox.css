@@ -382,3 +382,32 @@
     font-weight: 600;
     margin-bottom: 8px;
 }
+
+/* === Legendary Celebration === */
+
+/* 金边闪烁 */
+body.legendary-flash {
+    animation: legendary-border-flash 0.5s ease-in-out 3;
+}
+
+@keyframes legendary-border-flash {
+    0%, 100% { box-shadow: inset 0 0 0 4px transparent; }
+    50% { box-shadow: inset 0 0 0 6px rgba(255, 215, 0, 0.7); }
+}
+
+/* 传说生物 emoji 脉冲放大 */
+.legendary-burst {
+    font-size: 64px !important;
+    animation: legendary-burst-pop 1s ease-out;
+}
+
+@keyframes legendary-burst-pop {
+    0% { transform: scale(0.3); opacity: 0; filter: brightness(3); }
+    40% { transform: scale(1.2); opacity: 1; filter: brightness(2); }
+    100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
+
+/* 传说结果卡增强 */
+.legendary-result .result-creature-display {
+    animation: legendary-glow 2s ease-in-out infinite;
+}

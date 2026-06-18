@@ -272,7 +272,16 @@ const App = {
             State.updateProfilePopup();
             let msg = `签到成功! 🔥+${result.streak}天 🐚+${result.reward.shells}`;
             if (result.reward.pearls) msg += ` 🦪+${result.reward.pearls}`;
-            State.showToast(msg, 'reward');
+            // 签到烟花
+            const cx = Aquarium.width / 2, cy = Aquarium.height / 2;
+            ParticleManager.emit('firework', cx, cy, { count: 50 });
+            if (result.streak >= 7) {
+                setTimeout(() => ParticleManager.emit('firework', cx - 80, cy - 40, { count: 40 }), 400);
+            }
+            if (result.streak >= 30) {
+                setTimeout(() => ParticleManager.emit('firework', cx + 80, cy - 40, { count: 40, colors: ['#FFD700', '#FFD700', '#FFEB3B', '#FFF', '#FFD700'] }), 800);
+            }
+            State.showToast(msg, 'reward', '🎉');
             if (btn) {
                 btn.classList.add('checked');
             }

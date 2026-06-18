@@ -137,10 +137,29 @@ const Interaction = {
         const existing = document.querySelector('.creature-info-card');
         if (existing) existing.remove();
 
+        const phrases = [
+            'Hello there! 🐟',
+            'Keep learning! 📚',
+            'The ocean is beautiful! 🌊',
+            'You\'re doing great! ⭐',
+            'English is fun! 🎉',
+            'Dive deeper! 🤿',
+            'Bubble bubble~ 🫧',
+            'Glub glub! 💧',
+            'Practice makes perfect! 💪',
+            'Explore the sea! 🗺️',
+            'Never give up! 🚀',
+            'Words are treasures! 💎',
+            'Swim with me! 🏊',
+            'Stay curious! 🔍',
+            'Sea you later! 👋',
+        ];
+        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
 
         const card = document.createElement('div');
         card.className = 'creature-info-card';
         card.innerHTML = `
+            <div class="cic-speech-bubble">${phrase}</div>
             <div class="cic-header" style="border-color:${C.RARITY_COLORS[creature.rarity]}">
                 <span class="cic-emoji">${C.CREATURE_EMOJIS[creature.id] || C.DEFAULT_CREATURE_EMOJI}</span>
                 <div class="cic-names">

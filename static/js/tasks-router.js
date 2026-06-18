@@ -92,7 +92,12 @@ const Tasks = {
             State.updateUI();
             State.updateProfilePopup();
             this.closeModal();
-            State.showToast(`获得 🐚${result.reward.shells}${result.reward.pearls ? ' 📎' + result.reward.pearls : ''}`, 'reward');
+            // 任务完成撒花
+            if (typeof ParticleManager !== 'undefined') {
+                const cx = window.innerWidth / 2, cy = window.innerHeight * 0.35;
+                ParticleManager.emit('firework', cx, cy, { count: 30, colors: ['#FFD700', '#00FFC8', '#C77DFF', '#FF9800', '#FFF'] });
+            }
+            State.showToast(`获得 🐚${result.reward.shells}${result.reward.pearls ? ' 📎' + result.reward.pearls : ''}`, 'reward', '✅');
             if (typeof App !== 'undefined' && App.currentPanel === 'practice' && App.currentCategory) {
                 Tasks.loadTasksForCategory(App.currentCategory);
             }

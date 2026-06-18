@@ -108,12 +108,13 @@ const Blindbox = {
 
         const c = result.creature;
         const emoji = C.CREATURE_EMOJIS[c.id] || C.DEFAULT_CREATURE_EMOJI;
+        const isLegendary = c.rarity === 'legendary';
 
         resultDiv.innerHTML = `
-            <div class="box-result rarity-${c.rarity}">
+            <div class="box-result rarity-${c.rarity} ${isLegendary ? 'legendary-result' : ''}">
                 <p class="wheel-result-tag">🎯 转盘抽中：${segment.label}</p>
                 ${result.is_duplicate ? `<div class="duplicate-badge">🔄 重复生物 +🐚${result.duplicate_reward}</div>` : ''}
-                <div class="result-creature-display">${emoji}</div>
+                <div class="result-creature-display ${isLegendary ? 'legendary-burst' : ''}">${emoji}</div>
                 <div class="result-creature-name">${c.name}</div>
                 <div class="result-creature-name-en">${c.name_en}</div>
                 <span class="result-rarity-tag">${C.RARITY_NAMES[c.rarity]}</span>
@@ -124,6 +125,20 @@ const Blindbox = {
                 </div>
             </div>
         `;
+
+        // 传说级庆祝：烟花 + 金边闪烁
+        if (isLegendary) {
+            const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+            if (typeof ParticleManager !== 'undefined') {
+                ParticleManager.emit('firework', cx, cy, { count: 60, colors: ['#FFD700', '#FFD700', '#FFEB3B', '#FFF', '#FFD700', '#FFA500'] });
+                setTimeout(() => ParticleManager.emit('firework', cx - 100, cy - 40, { count: 40, colors: ['#FFD700', '#FFEB3B', '#FFF', '#FFD700'] }), 400);
+                setTimeout(() => ParticleManager.emit('firework', cx + 100, cy - 40, { count: 40, colors: ['#FFD700', '#FFEB3B', '#FFF', '#FFD700'] }), 800);
+            }
+            // 金边闪烁
+            document.body.classList.add('legendary-flash');
+            setTimeout(() => document.body.classList.remove('legendary-flash'), 1500);
+        }
+
         this.isAnimating = false;
     },
 

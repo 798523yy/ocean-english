@@ -180,9 +180,11 @@ const ParticleManager = {
                         this.emit('surface_ripple', p.x, 35, {});
                         p.y = height - 50 + Math.random() * 30;
                         p.x = Math.random() * width;
-                        // 随机大小
+                        // 随机大小和相位
                         p.size = 1.5 + Math.random() * 7;
                         p.wobbleAmp = 0.2 + Math.random() * 0.6;
+                        p.wobble = Math.random() * Math.PI * 2;
+                        p.wobbleSpeed = 0.01 + Math.random() * 0.03;
                     }
                     break;
 

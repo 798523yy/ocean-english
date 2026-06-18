@@ -103,7 +103,7 @@ body {
     -webkit-font-smoothing: antialiased;
     user-select: none;
     -webkit-user-select: none;
-    transition: background var(--transition-smooth);
+    transition: background 3s ease;
 }
 
 /* ================================================

@@ -20,17 +20,17 @@ const Lighting = {
             causticAlpha: 0.05,
         },
         night: {
-            top: '#050510', mid: '#0D1B2A', low: '#091420', bot: '#030810',
-            ray: 'rgba(69,228,181,0.04)', rayEnd: 'rgba(69,228,181,0)',
-            sand1: '#3A5068', sand2: '#2A3A50', sand3: '#1A2230',
-            causticAlpha: 0.03,
+            top: '#040A18', mid: '#0A1A3A', low: '#071430', bot: '#020810',
+            ray: 'rgba(69, 228, 181, 0.05)', rayEnd: 'rgba(0, 200, 180, 0)',
+            sand1: '#2A4A6A', sand2: '#1E3850', sand3: '#122030',
+            causticAlpha: 0.04,
         },
     },
 
     currentPeriod: 'day',
     targetPeriod: 'day',
     transitionProgress: 1.0,
-    transitionDuration: 1000,
+    transitionDuration: 3000,  // 1000 → 3000
     currentColors: null,
 
     init() {

@@ -13,16 +13,7 @@ const Auth = {
         }
 
         try {
-            const resp = await fetch('/api/auth/send-code', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone })
-            });
-            const data = await resp.json();
-            if (!resp.ok) {
-                State.showToast(data.error || '发送失败', 'error');
-                return;
-            }
+            const data = await API.request('POST', '/auth/send-code', { phone });
             document.getElementById('login-code').value = data.demo_code || '';
             State.showToast('验证码已发送 (Demo: 已自动填入)', 'success');
 
@@ -34,7 +25,7 @@ const Auth = {
                 if (this.countdown <= 0) clearInterval(this.timer);
             }, 1000);
         } catch (e) {
-            State.showToast('网络错误', 'error');
+            State.showToast(e.error || '网络错误', 'error');
         }
     },
 
@@ -60,22 +51,12 @@ const Auth = {
         }
 
         try {
-            const resp = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, code })
-            });
-            const data = await resp.json();
-            if (!resp.ok) {
-                State.showToast(data.error || '登录失败', 'error');
-                return;
-            }
-
+            const data = await API.request('POST', '/auth/login', { phone, code });
             localStorage.setItem('ocean_english_uid', phone);
             API.uid = phone;
             App.onLoginSuccess(data.user, data.level);
         } catch (e) {
-            State.showToast('网络错误', 'error');
+            State.showToast(e.error || '网络错误', 'error');
         }
     },
 

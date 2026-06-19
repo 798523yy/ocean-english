@@ -78,7 +78,70 @@ const App = {
         State.level = level;
         State.updateUI();
         State.updateProfilePopup();
+        this._syncMuteIcon();
         Aquarium.init();
+        // First-time onboarding
+        if (!localStorage.getItem('ocean_onboarded')) {
+            setTimeout(() => this._showOnboarding(), 800);
+        }
+    },
+
+    _syncMuteIcon() {
+        const btn = document.getElementById('mute-toggle');
+        if (!btn) return;
+        if (typeof Sound !== 'undefined' && Sound._muted) {
+            btn.classList.add('muted');
+            btn.innerHTML = '&#x1f507;';
+        } else {
+            btn.classList.remove('muted');
+            btn.innerHTML = '&#x1f50a;';
+        }
+    },
+
+    _showOnboarding() {
+        const steps = [
+            { sel: '#checkin-btn', text: '☀️ 每日签到获取贝壳和珍珠<br>连续签到奖励更多！', pos: 'left' },
+            { sel: '#practice-btn', text: '📚 练习英语 — 单词、听力、口语<br>完成任务升级解锁新生物', pos: 'left' },
+            { sel: '#blindbox-btn', text: '🎁 抽奖转盘获取海洋生物<br>集齐图鉴打造你的水族馆', pos: 'left' },
+        ];
+        let stepIdx = 0;
+        let overlay = null;
+        let tooltip = null;
+
+        const showStep = () => {
+            if (overlay) overlay.remove();
+            const step = steps[stepIdx];
+            const target = document.querySelector(step.sel);
+            overlay = document.createElement('div');
+            overlay.className = 'onboard-overlay';
+            const rect = target ? target.getBoundingClientRect() : { left: 0, top: 0, width: 50, height: 50 };
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            overlay.innerHTML = `
+                <div class="onboard-spotlight" style="left:${cx}px;top:${cy}px;width:${Math.max(rect.width, rect.height) + 24}px;height:${Math.max(rect.width, rect.height) + 24}px;"></div>
+                <div class="onboard-tooltip" style="${step.pos === 'left' ? 'right:' + (window.innerWidth - rect.left + 20) + 'px' : 'left:' + (rect.right + 20) + 'px'};top:${cy}px;">
+                    <p>${step.text}</p>
+                    <div class="onboard-actions">
+                        <span class="onboard-dots">${steps.map((_, i) => i === stepIdx ? '●' : '○').join(' ')}</span>
+                        <button class="onboard-next-btn">${stepIdx < steps.length - 1 ? '下一步 →' : '开始探索 🐠'}</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            const nextBtn = overlay.querySelector('.onboard-next-btn');
+            nextBtn.addEventListener('click', () => {
+                stepIdx++;
+                if (stepIdx < steps.length) {
+                    showStep();
+                } else {
+                    overlay.remove();
+                    localStorage.setItem('ocean_onboarded', '1');
+                }
+            });
+        };
+
+        showStep();
     },
 
     // === Profile Popup ===
@@ -258,6 +321,64 @@ const App = {
         Collection.close();
     },
 
+    // === Mute ===
+
+    toggleMute() {
+        if (typeof Sound === 'undefined') return;
+        const btn = document.getElementById('mute-toggle');
+        if (Sound._muted) {
+            Sound.unmute();
+            if (btn) { btn.classList.remove('muted'); btn.innerHTML = '&#x1f50a;'; }
+        } else {
+            Sound.mute();
+            if (btn) { btn.classList.add('muted'); btn.innerHTML = '&#x1f507;'; }
+        }
+    },
+
+    // === Redeem ===
+
+    _redeemOverlay: null,
+
+    showRedeem() {
+        if (this._redeemOverlay) return;
+        const overlay = document.createElement('div');
+        overlay.className = 'redeem-overlay';
+        overlay.onclick = (e) => { if (e.target === overlay) this.closeRedeem(); };
+        overlay.innerHTML = `
+            <div class="redeem-modal">
+                <div class="redeem-modal-header">
+                    <h2>🎫 兑换码</h2>
+                    <p>输入兑换码获取奖励</p>
+                </div>
+                <button class="redeem-modal-close" onclick="App.closeRedeem()">✕</button>
+                <div class="redeem-modal-body">
+                    <input type="text" id="redeem-code-input" placeholder="输入兑换码" maxlength="20" autocomplete="off">
+                    <button class="redeem-submit-btn" id="redeem-submit-btn" onclick="Redeem.submit()">兑换</button>
+                    <p class="redeem-modal-msg" id="redeem-modal-msg"></p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        this._redeemOverlay = overlay;
+        // Auto-focus input + Enter key support
+        setTimeout(() => {
+            const inp = document.getElementById('redeem-code-input');
+            if (inp) {
+                inp.focus();
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') Redeem.submit();
+                });
+            }
+        }, 100);
+    },
+
+    closeRedeem() {
+        if (this._redeemOverlay) {
+            this._redeemOverlay.remove();
+            this._redeemOverlay = null;
+        }
+    },
+
     // === Checkin ===
 
     async quickCheckin() {
@@ -270,6 +391,8 @@ const App = {
             const result = await API.checkin();
             State.user = result.user;
             State.level = result.level;
+            // Save check-in date for calendar
+            State._addCheckinDate(new Date().toISOString().split('T')[0]);
             State.updateUI();
             State.updateProfilePopup();
             let msg = `签到成功! 🔥+${result.streak}天 🐚+${result.reward.shells}`;
@@ -305,13 +428,17 @@ const App = {
 const Redeem = {
     async submit() {
         const input = document.getElementById('redeem-code-input');
-        const msgEl = document.getElementById('redeem-msg');
+        const msgEl = document.getElementById('redeem-modal-msg');
+        const btn = document.getElementById('redeem-submit-btn');
         const code = input.value.trim();
 
         if (!code) {
             this._showMsg('请输入兑换码', 'error');
             return;
         }
+
+        btn.disabled = true;
+        btn.textContent = '兑换中...';
 
         try {
             const resp = await fetch('/api/redeem', {
@@ -322,6 +449,8 @@ const Redeem = {
             const data = await resp.json();
             if (!resp.ok) {
                 this._showMsg(data.error || '兑换失败', 'error');
+                btn.disabled = false;
+                btn.textContent = '兑换';
                 return;
             }
 
@@ -331,18 +460,20 @@ const Redeem = {
             this._showMsg(data.message, 'success');
             State.showToast(`兑换成功！+🐚${data.reward.shells} +🦪${data.reward.pearls}`, 'reward');
             input.value = '';
+            // Close modal after success
+            setTimeout(() => App.closeRedeem(), 1200);
         } catch (e) {
             this._showMsg('网络错误', 'error');
+            btn.disabled = false;
+            btn.textContent = '兑换';
         }
     },
 
     _showMsg(msg, type) {
-        const msgEl = document.getElementById('redeem-msg');
+        const msgEl = document.getElementById('redeem-modal-msg');
         if (!msgEl) return;
         msgEl.textContent = msg;
-        msgEl.className = `redeem-msg ${type}`;
-        msgEl.classList.remove('hidden');
-        setTimeout(() => msgEl.classList.add('hidden'), 3000);
+        msgEl.className = `redeem-modal-msg ${type}`;
     }
 };
 
@@ -365,6 +496,7 @@ document.addEventListener('keydown', (e) => {
         if (Settings._overlay) Settings.close();
         else if (Friends._overlay) Friends.close();
         else if (Collection._overlay) Collection.close();
+        else if (App._redeemOverlay) App.closeRedeem();
         else if (App.profileOpen) App.closeProfilePopup();
         else App.closePanel();
     }

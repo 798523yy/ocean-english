@@ -15,6 +15,15 @@ const Sound = {
 	// ==========================================
 
 	init() {
+		// 从 localStorage 恢复音量设置
+		try {
+			const saved = localStorage.getItem('ocean_sound');
+			if (saved) {
+				const s = JSON.parse(saved);
+				this._muted = s.muted || false;
+				this._volume = s.volume !== undefined ? s.volume : 0.6;
+			}
+		} catch (e) {}
 		// AudioContext 懒初始化——首次用户交互时创建
 		const resumeCtx = () => {
 			if (this.ctx && this.ctx.state === 'suspended') {
@@ -45,6 +54,7 @@ const Sound = {
 
 	setMasterVolume(v) {
 		this._volume = Math.max(0, Math.min(1, v));
+		this._saveSettings();
 		if (this.masterGain && !this._muted) {
 			this.masterGain.gain.setTargetAtTime(this._volume, this.ctx.currentTime, 0.1);
 		}
@@ -52,6 +62,7 @@ const Sound = {
 
 	mute() {
 		this._muted = true;
+		this._saveSettings();
 		if (this.masterGain) {
 			this.masterGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.05);
 		}
@@ -59,9 +70,19 @@ const Sound = {
 
 	unmute() {
 		this._muted = false;
+		this._saveSettings();
 		if (this.masterGain) {
 			this.masterGain.gain.setTargetAtTime(this._volume, this.ctx.currentTime, 0.1);
 		}
+	},
+
+	_saveSettings() {
+		try {
+			localStorage.setItem('ocean_sound', JSON.stringify({
+				muted: this._muted,
+				volume: this._volume
+			}));
+		} catch (e) {}
 	},
 
 	// ==========================================
@@ -388,9 +409,6 @@ const Sound = {
 		this._clearWeather();
 		if (weather === 'rainy') {
 			this._startRain(0.02);
-		} else if (weather === 'stormy') {
-			this._startRain(0.04);
-			this._scheduleThunder();
 		} else if (weather === 'cloudy') {
 			this._startWind(0.01);
 		}
@@ -466,42 +484,7 @@ const Sound = {
 		this.weatherNodes.push(source);
 	},
 
-	_scheduleThunder() {
-		const delay = 3000 + Math.random() * 8000;
-		this._thunderTimer = setTimeout(() => {
-			this.playThunder();
-			this._scheduleThunder();
-		}, delay);
-	},
 
-	playThunder() {
-		if (!this.ensureCtx()) return;
-		const t = this.ctx.currentTime;
-		const dur = 1.5 + Math.random() * 1.5;
-		const bufferSize = this.ctx.sampleRate * dur;
-		const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-		const data = buffer.getChannelData(0);
-		// 棕噪声近似
-		let last = 0;
-		for (let i = 0; i < bufferSize; i++) {
-			last = (last + (Math.random() * 2 - 1) * 0.02) / 1.01;
-			data[i] = last * 3;
-		}
-		const source = this.ctx.createBufferSource();
-		source.buffer = buffer;
-		const lowpass = this.ctx.createBiquadFilter();
-		lowpass.type = 'lowpass';
-		lowpass.frequency.value = 150;
-		const gain = this.ctx.createGain();
-		gain.gain.setValueAtTime(0, t);
-		gain.gain.linearRampToValueAtTime(0.15, t + 0.2);
-		gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-		source.connect(lowpass);
-		lowpass.connect(gain);
-		gain.connect(this.masterGain);
-		source.start(t);
-		source.stop(t + dur);
-	},
 
 	// ==========================================
 	// Task 7: 背景音乐（时段氛围 Pad）

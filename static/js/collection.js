@@ -4,12 +4,23 @@ const Collection = {
 
     async show() {
         this.close();
+        // Show loading skeleton
+        this._showLoading();
         try {
             const data = await API.getCreatures();
             this._render(data);
         } catch (e) {
             State.showToast('加载图鉴失败', 'error');
+            this.close();
         }
+    },
+
+    _showLoading() {
+        const overlay = document.createElement('div');
+        overlay.className = 'collection-overlay';
+        overlay.innerHTML = `<div class="loading-spinner-container"><div class="loading-spinner"></div><p class="loading-text">Loading...</p></div>`;
+        document.body.appendChild(overlay);
+        this._overlay = overlay;
     },
 
     _render(data) {

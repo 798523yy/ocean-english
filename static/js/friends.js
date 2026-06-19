@@ -5,8 +5,17 @@ const Friends = {
 
     async show() {
         this.close();
+        this._showLoading();
         this._currentTab = 'list';
         await this._loadAndRender();
+    },
+
+    _showLoading() {
+        const overlay = document.createElement('div');
+        overlay.className = 'friends-overlay';
+        overlay.innerHTML = `<div class="loading-spinner-container"><div class="loading-spinner"></div><p class="loading-text">Loading...</p></div>`;
+        document.body.appendChild(overlay);
+        this._overlay = overlay;
     },
 
     async _loadAndRender() {

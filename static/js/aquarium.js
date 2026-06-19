@@ -17,7 +17,6 @@ const Aquarium = {
     weather: 'sunny',
     weatherTimer: 0,
     weatherDuration: 0,
-    lightningTimer: 0,
 
     // Debug
     debug: false,
@@ -74,10 +73,9 @@ const Aquarium = {
 
     randomWeather() {
         const r = Math.random();
-        if (r < 0.4) return 'sunny';
-        if (r < 0.65) return 'cloudy';
-        if (r < 0.88) return 'rainy';
-        return 'stormy';
+        if (r < 0.45) return 'sunny';
+        if (r < 0.75) return 'cloudy';
+        return 'rainy';
     },
 
     fadeInSprites() {
@@ -370,16 +368,6 @@ const Aquarium = {
             if (Math.random() < 0.25) {
                 ParticleManager.emit('rain', Math.random() * this.width, -10, {});
             }
-        } else if (this.weather === 'stormy') {
-            if (Math.random() < 0.3) {
-                ParticleManager.emit('rain', Math.random() * this.width, -10, {});
-            }
-            // Lightning
-            this.lightningTimer -= dt;
-            if (this.lightningTimer <= 0) {
-                ParticleManager.emit('lightning', 100 + Math.random() * (this.width - 200), 0, {});
-                this.lightningTimer = 3000 + Math.random() * 8000;
-            }
         }
     },
 
@@ -393,21 +381,12 @@ const Aquarium = {
                 ctx.fillStyle = 'rgba(30, 40, 60, 0.12)';
                 ctx.fillRect(0, 0, this.width, this.height);
                 break;
-            case 'stormy':
-                ctx.fillStyle = 'rgba(20, 25, 40, 0.2)';
-                ctx.fillRect(0, 0, this.width, this.height);
-                // Lightning flash
-                if (this.lightningTimer > -200 && this.lightningTimer < 0) {
-                    ctx.fillStyle = 'rgba(180, 200, 240, 0.06)';
-                    ctx.fillRect(0, 0, this.width, this.height);
-                }
-                break;
         }
     },
 
     // Expose weather for debug/display
     getWeatherEmoji() {
-        const map = { sunny: '☀️', cloudy: '☁️', rainy: '🌧️', stormy: '⛈️' };
+        const map = { sunny: '☀️', cloudy: '☁️', rainy: '🌧️' };
         return map[this.weather] || '☀️';
     }
 };

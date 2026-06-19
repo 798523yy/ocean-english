@@ -55,7 +55,21 @@
         <div class="user-name-area">
             <span id="user-name">探险家</span>
             <span class="user-level" id="user-level-tag">探险新手</span>
+            <div class="level-progress-wrap" id="level-progress-wrap">
+                <div class="level-progress-bar"><div class="level-progress-fill" id="level-progress-fill" style="width:0%"></div></div>
+                <div class="level-progress-text" id="level-progress-text"></div>
+            </div>
         </div>
+    </div>
+
+    <!-- 每日目标浮标 -->
+    <div id="daily-goal-float" class="daily-goal-float" title="今日目标" onclick="App.openPanel('practice', 'vocabulary')">
+        <svg class="goal-ring" viewBox="0 0 36 36">
+            <circle class="goal-ring-bg" cx="18" cy="18" r="15"></circle>
+            <circle class="goal-ring-fill" id="goal-ring-fill" cx="18" cy="18" r="15"
+                stroke-dasharray="0 100" stroke-dashoffset="0"></circle>
+        </svg>
+        <span class="goal-text" id="goal-text">0/3</span>
     </div>
 
     <!-- 右上角资源浮标 -->
@@ -76,6 +90,7 @@
             &#x1f525; <span id="streak-count">0</span>天
             <span class="streak-reward-hint" id="streak-reward-hint"></span>
         </div>
+        <span class="mute-toggle" id="mute-toggle" title="音效开关" onclick="App.toggleMute()">&#x1f50a;</span>
     </div>
 
     <!-- 个人信息弹窗 -->
@@ -89,6 +104,8 @@
             </div>
             <div class="profile-level-en" id="level-title-en">Explorer Newbie</div>
         </div>
+        <!-- 签到热力条 -->
+        <div class="streak-calendar" id="streak-calendar"></div>
         <div class="profile-stats">
             <div class="profile-stat">
                 <div class="pstat-value" id="pstat-tasks">0</div>
@@ -114,15 +131,6 @@
                 <div class="pstat-value" id="pstat-phone">-</div>
                 <div class="pstat-label">手机号</div>
             </div>
-        </div>
-        <!-- 兑换码 -->
-        <div class="redeem-section">
-            <div class="redeem-title">🎫 兑换码</div>
-            <div class="redeem-input-row">
-                <input type="text" id="redeem-code-input" placeholder="输入兑换码" maxlength="20" autocomplete="off">
-                <button class="btn-redeem" onclick="Redeem.submit()">兑换</button>
-            </div>
-            <p class="redeem-msg hidden" id="redeem-msg"></p>
         </div>
         <button class="btn-settings" onclick="Settings.show()">⚙️ 编辑资料</button>
         <button class="btn-logout" onclick="Auth.logout()">退出登录</button>
@@ -166,6 +174,10 @@
             <button id="checkin-btn" class="action-fab checkin-action" onclick="App.quickCheckin()">
                 <span class="fab-bg"></span>
                 <span class="fab-icon-main">&#x2600;</span>
+            </button>
+            <button id="redeem-fab" class="action-fab redeem-fab" onclick="App.showRedeem()">
+                <span class="fab-bg"></span>
+                <span class="fab-icon-main">&#x1f3ab;</span>
             </button>
         </div>
     </div>
